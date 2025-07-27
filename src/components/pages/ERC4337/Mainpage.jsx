@@ -358,7 +358,7 @@ const Mainpage = () => {
     const queryClient = useQueryClient()
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    
+    const BASE_API = process.env.REACT_APP_API_BASE_URL
 
     const { data, isLoading } = useQuery({
         queryKey: ["user"],
