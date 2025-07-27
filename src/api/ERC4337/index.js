@@ -1,0 +1,1 @@
+export default BASE_API = process.env.REACT_APP_API_BASE_URL

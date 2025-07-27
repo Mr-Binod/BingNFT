@@ -358,12 +358,13 @@ const Mainpage = () => {
     const queryClient = useQueryClient()
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    
 
     const { data, isLoading } = useQuery({
         queryKey: ["user"],
         queryFn: async () => {
             const data = await getUserInfoCreate(userId)
-            const { data: sellnft } = await axios.get("http://localhost:3001/sellnft")
+            const { data: sellnft } = await axios.get(`${BASE_API}/sellnft`)
             console.log(sellnft, "ss")
             const parsedSellnft = sellnft.message.map((el) => {
                 const parsed = JSON.parse(el.nftUridata)
@@ -443,7 +444,7 @@ const Mainpage = () => {
                     const JsonData = JSON.stringify(uridata.data)
                     const _data = { userid: userId, nftid: newtokenId, nftidToken, nftUridata: JsonData }
                     console.log(_data)
-                    const data = await axios.post(`http://localhost:3001/createusernft`, _data)
+                    const data = await axios.post(`${BASE_API}/createusernft`, _data)
                     console.log(data)
                     dispatch({ type: "Loading", payload: false })
                 } catch (error) {
@@ -537,9 +538,9 @@ const Mainpage = () => {
         const confirmed = window.confirm("판매 취소 하시겠습니까?")
         if (!confirmed) return
         dispatch({ type: "Loading", payload: true })
-        const { data } = await axios.delete("http://localhost:3001/sellnft", { data: _data })
-        const { data: PatchData } = await axios.patch("http://localhost:3001/sellnft", updataData)
-        const { data: ContractRes } = await axios.delete("http://localhost:3001/contractsellnft", { data: _data })
+        const { data } = await axios.delete(`${BASE_API}/sellnft`, { data: _data })
+        const { data: PatchData } = await axios.patch(`${BASE_API}/sellnft`, updataData)
+        const { data: ContractRes } = await axios.delete(`${BASE_API}/contractsellnft`, { data: _data })
         if ((ContractRes.state = 200)) alert("네트워크에 기로 되었습니다")
         dispatch({ type: "Loading", payload: false })
         await queryClient.invalidateQueries({ queryKey: ["user"] })
@@ -557,11 +558,11 @@ const Mainpage = () => {
         const data = { userid: userId, sender, nftid, nftUridata: stringifyData, nftidToken, price, receiver }
         const _data = { smartAccAddress: sender, nftid }
         dispatch({ type: "Loading", payload: true })
-        const result = await axios.post("http://localhost:3001/buynft", data)
+        const result = await axios.post(`${BASE_API}/buynft`, data)
 
         console.log(result, "buynft")
-        const { data: Deletedata } = await axios.delete("http://localhost:3001/sellnft", { data: _data })
-        const result2 = await axios.post("http://localhost:3001/contractbuynft", data)
+        const { data: Deletedata } = await axios.delete(`${BASE_API}/sellnft`, { data: _data })
+        const result2 = await axios.post(`${BASE_API}/contractbuynft`, data)
 
         const amount = ethers.parseEther(`${price}`, 18)
         console.log({ sender, nftid, nftUridata, nftidToken, price, amount })

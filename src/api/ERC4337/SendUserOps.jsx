@@ -3,6 +3,7 @@ import { AbiCoder, ethers, Wallet } from "ethers";
 
 const sendEntryPoint = async (smartAccCA, EntryPointContract, callData, signer) => {
 
+    const BASE_API = process.env.REACT_APP_API_BASE_URL
     const amount = ethers.parseEther("1000", 18);
     const value = ethers.parseEther("0");
     // const mintCallData = Token.interface.encodeFunctionData("mint", [smartAccountAddress, amount]);
@@ -71,7 +72,7 @@ const sendEntryPoint = async (smartAccCA, EntryPointContract, callData, signer) 
         return result;
     }
     const res = await axios.post(
-        "http://localhost:3001/userop",
+        `${BASE_API}/userop`,
         userOpToJson(userOp)
     )
     console.log(res)
