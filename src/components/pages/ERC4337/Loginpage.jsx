@@ -128,6 +128,9 @@ const Newpage = () => {
 
   const { loading } = useSelector((state) => state.LoginReducer)
 
+
+
+
   const signUpHandler = useMutation({
     mutationFn: async (e) => {
       e.preventDefault()

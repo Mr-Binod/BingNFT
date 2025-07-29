@@ -316,11 +316,13 @@ const Mypage = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
+  const BaseUrl = process.env.REACT_APP_API_BASE_URL
+
   const { data, isLoading } = useQuery({
     queryKey: ["mypage"],
     queryFn: async () => {
       const data = await getUserInfoCreate(userId)
-      const { data: sellnft } = await axios.get("http://localhost:3001/sellnft")
+      const { data: sellnft } = await axios.get(`${BaseUrl}/sellnft`)
       console.log(sellnft, "ss")
       const parsedSellnft = sellnft.message.map((el) => {
         const parsed = JSON.parse(el.nftUridata)
@@ -343,7 +345,7 @@ const Mypage = () => {
         const balance = await TokenContract.balanceOf(userinfo.smartAcc)
         const newBalance = Math.floor(Number(ethers.formatEther(balance)))
         setBalance(newBalance)
-        const { data } = await axios.get(`http://localhost:3001/user/${userId}`)
+        const { data } = await axios.get(`${BaseUrl}/user/${userId}`)
         const parsedData = data.message.map((el, i) => {
           const newNftUridata = JSON.parse(el.nftUridata)
           return { ...el, nftUridata: newNftUridata }
@@ -370,12 +372,12 @@ const Mypage = () => {
       price: Number(uintprice.value),
       nftUridata: selldata.nftUridata,
     }
-    const { data: findOne } = await axios.get(`http://localhost:3001/sellnft/${selldata.userid}/${selldata.nftid}`)
+    const { data: findOne } = await axios.get(`${BaseUrl}/sellnft/${selldata.userid}/${selldata.nftid}`)
     if (findOne.message) return alert("이미 판매중 아니템입니다 취소후 다시 시도해주세요")
     dispatch({ type: "Loading", payload: true })
-    const { data } = await axios.post("http://localhost:3001/sellnft", _data)
+    const { data } = await axios.post(`${BaseUrl}/sellnft`, _data)
     // if (data) alert('NFT 판매 등록 완료되었습니다')
-    const { data: contractData } = await axios.post("http://localhost:3001/contractsellnft", _data)
+    const { data: contractData } = await axios.post(`${BaseUrl}/contractsellnft`, _data)
     if (contractData.state === 201) alert("NFT 네트워크에 기록 되었습니다다")
     CheckZero()
     await queryClient.invalidateQueries({ queryKey: ["mypage"] })
@@ -398,9 +400,9 @@ const Mypage = () => {
     const confirmed = window.confirm("판매 취소 하시겠습니까?")
     if (!confirmed) return
     dispatch({ type: "Loading", payload: true })
-    const { data } = await axios.delete("http://localhost:3001/sellnft", { data: _data })
-    const { data: PatchData } = await axios.patch("http://localhost:3001/sellnft", updataData)
-    const { data: ContractRes } = await axios.delete("http://localhost:3001/contractsellnft", { data: _data })
+    const { data } = await axios.delete(`${BaseUrl}/sellnft`, { data: _data })
+    const { data: PatchData } = await axios.patch(`${BaseUrl}/sellnft`, updataData)
+    const { data: ContractRes } = await axios.delete(`${BaseUrl}/contractsellnft`, { data: _data })
     if ((ContractRes.state = 200)) alert("네트워크에 기로 되었습니다")
     dispatch({ type: "Loading", payload: false })
     await queryClient.invalidateQueries({ queryKey: ["mypage"] })
