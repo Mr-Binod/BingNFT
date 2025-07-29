@@ -71,7 +71,7 @@ const sendEntryPoint = async (smartAccCA, EntryPointContract, callData, signer) 
         return result;
     }
     const res = await axios.post(
-        `${BASE_API}/userop`,
+        `${process.env.REACT_APP_API_BASE_URL}/userop`,
         userOpToJson(userOp)
     )
     console.log(res)
