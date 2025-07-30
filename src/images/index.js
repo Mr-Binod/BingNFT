@@ -1,3 +1,3 @@
-import loadingGif from './loading.gif'
+import loadingGif from './loaad.gif'
 
 export default loadingGif

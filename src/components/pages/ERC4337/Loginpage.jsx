@@ -92,6 +92,8 @@ const Button = styled.button`
   align-items: center;
   justify-content: center;
   gap: 8px;
+  box-sizing: border-box;
+  position: relative;
 
   &:hover {
     background: #1f2937;
@@ -104,8 +106,11 @@ const Button = styled.button`
 `
 
 const LoadingImage = styled.img`
-  width: 16px;
-  height: 16px;
+position: absolute;
+left: 60px;
+  width: 50px;
+  height: 50px;
+  box-sizing: border-box;
 `
 
 const Divider = styled.div`

@@ -142,6 +142,7 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 8px;
+  position: relative;
 
   &:hover {
     background: #1f2937;
@@ -264,6 +265,7 @@ const NFTSeller = styled.div`
 const ActionButton = styled(Button)`
   width: 100%;
   justify-content: center;
+  position:relative;
 
   &.cancel {
     background: #dc2626;
@@ -283,8 +285,11 @@ const ActionButton = styled(Button)`
 `
 
 const LoadingImage = styled.img`
-  width: 16px;
-  height: 16px;
+position: absolute;
+left: 60px;
+  width: 50px;
+  height: 50px;
+  box-sizing: border-box;
 `
 
 const Modal = styled.div`
