@@ -202,6 +202,7 @@ const Button = styled.button`
   justify-content: center;
   gap: 8px;
   width: 100%;
+  position : relative;
 
   &:hover {
     background: #1f2937;
@@ -286,8 +287,11 @@ const CancelButton = styled(Button)`
 `
 
 const LoadingImage = styled.img`
-  width: 16px;
-  height: 16px;
+position: absolute;
+left: 60px;
+  width: 50px;
+  height: 50px;
+  box-sizing: border-box;
 `
 
 const EmptyState = styled.div`
