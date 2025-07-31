@@ -129,7 +129,6 @@ const Newpage = () => {
   const queryClient = useQueryClient()
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const [render, setRender] = useState(0)
 
   const { loading } = useSelector((state) => state.LoginReducer)
 
@@ -150,7 +149,7 @@ const Newpage = () => {
       }
       dispatch({ type: "Loading", payload: true })
       const response = await CreateAcc(data)
-      console.log(response)
+      // console.log(response)
       if (response.state === 200) alert("가입 완료되었습니다")
       if (response.state === 201) alert("이미 사용되고 있는 아이디 입니다")
 
@@ -158,7 +157,6 @@ const Newpage = () => {
       signuppw.value = ""
       dispatch({ type: "Loading", payload: false })
       navigate("/")
-      setRender((prev) => prev + 1)
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["user"])
@@ -171,9 +169,9 @@ const Newpage = () => {
     e.preventDefault()
 
     const { userid, userpw } = e.target
-    console.log("gg", userid.value, userpw.value)
+    // console.log("gg", userid.value, userpw.value)
     const data = await getUserInfo(userid.value, userpw.value)
-    console.log(data, "f")
+    // console.log(data, "f")
     if (!data) return
     dispatch({ type: "setUserId", payload: userid.value }) // ✅ Set in Redux
     dispatch({ type: "login" })
@@ -182,7 +180,7 @@ const Newpage = () => {
     navigate("/main")
   }
 
-  console.log(loading)
+  // console.log(loading)
 
   return (
     <Container>

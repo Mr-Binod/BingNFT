@@ -10,7 +10,6 @@ const sendEntryPoint = async (smartAccCA, EntryPointContract, callData, signer) 
     //     [smartAccCA, value, mintCallData]
     // )
     const nonce = await EntryPointContract.nonces(smartAccCA)
-    console.log(nonce, 'ssss', smartAccCA)
     const userOp = {
         sender: smartAccCA,
         nonce ,
@@ -74,7 +73,6 @@ const sendEntryPoint = async (smartAccCA, EntryPointContract, callData, signer) 
         `${process.env.REACT_APP_API_BASE_URL}/userop`,
         userOpToJson(userOp)
     )
-    console.log(res)
     return res
 }
 

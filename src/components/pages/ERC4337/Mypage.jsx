@@ -327,13 +327,11 @@ const Mypage = () => {
     queryFn: async () => {
       const data = await getUserInfoCreate(userId)
       const { data: sellnft } = await axios.get(`${BaseUrl}/sellnft`)
-      console.log(sellnft, "ss")
       const parsedSellnft = sellnft.message.map((el) => {
         const parsed = JSON.parse(el.nftUridata)
         el.nftUridata = parsed
         return el
       })
-      console.log(parsedSellnft, data.message)
       dispatch({ type: "nftDatas", payload: parsedSellnft })
       return data
     },
@@ -362,7 +360,6 @@ const Mypage = () => {
     e.preventDefault()
     setIsactive(false)
     const { NfttknAmt, uintprice } = e.target
-    console.log(NfttknAmt, uintprice, userNfts, selldata)
     const UserNftidToken = userNfts.find((el) => el.nftid == selldata.nftid)
     if (uintprice.value <= 0) return alert("판매 가격을 확인해주세요")
     if (UserNftidToken.nftidToken < Number(NfttknAmt.value) || 0 >= Number(NfttknAmt.value))
@@ -385,14 +382,11 @@ const Mypage = () => {
     if (contractData.state === 201) alert("NFT 네트워크에 기록 되었습니다다")
     CheckZero()
     await queryClient.invalidateQueries({ queryKey: ["mypage"] })
-    console.log(await queryClient.invalidateQueries({ queryKey: ["mypage"] }))
     dispatch({ type: "Loading", payload: false })
   }
-  // console.log(queryClient.invalidateQueries())
 
   const LogoutHandler = () => {
     dispatch({ type: "logout" }) // This will clear userId and user too
-    console.log("zz")
     navigate('/')
   }
 
@@ -400,7 +394,6 @@ const Mypage = () => {
     const _data = { smartAccAddress: sender, nftid }
     const stringifyData = JSON.stringify(nftUridata)
     const updataData = { userid, nftid, nftUridata: stringifyData, nftidToken }
-    console.log(_data)
     const confirmed = window.confirm("판매 취소 하시겠습니까?")
     if (!confirmed) return
     dispatch({ type: "Loading", payload: true })
@@ -411,7 +404,6 @@ const Mypage = () => {
     dispatch({ type: "Loading", payload: false })
     await queryClient.invalidateQueries({ queryKey: ["mypage"] })
   }
-  console.log(sellLists, userId)
 
   if (!userinfo) {
     return <div>Loading...</div>

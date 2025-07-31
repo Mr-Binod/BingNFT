@@ -371,13 +371,11 @@ const Mainpage = () => {
     queryFn: async () => {
       const data = await getUserInfoCreate(userId)
       const { data: sellnft } = await axios.get(`${BaseUrl}/sellnft`)
-      console.log(sellnft, "ss")
       const parsedSellnft = sellnft.message.map((el) => {
         const parsed = JSON.parse(el.nftUridata)
         el.nftUridata = parsed
         return el
       })
-      console.log(parsedSellnft, data.message)
       setUserInfo(data.message)
       dispatch({ type: "setUser", payload: data.message })
       dispatch({ type: "nftDatas", payload: parsedSellnft })
@@ -410,7 +408,7 @@ const Mainpage = () => {
 
       console.log(nftname.value, nftdesc.value, File)
       if (!nftname.value.trim() || !nftdesc.value.trim() || !File) {
-        
+        dispatch({ type: "Loading", payload: false })
         return alert("모든 필드를 채워주세요.");
       }
       const nftName = nftname.value
@@ -439,7 +437,7 @@ const Mainpage = () => {
       }
       for (const event of latestEvent) {
         const { tokenId, sender, uri } = event.args
-        console.log(sender, userInfo.smartAcc, "ss")
+        // console.log(sender, userInfo.smartAcc, "ss")
         if (sender !== userInfo.smartAcc) return alert("ff")
         const nftidToken = Number(await NftContract.balanceOf(sender, tokenId))
         try {
@@ -449,15 +447,15 @@ const Mainpage = () => {
           const newtokenId = Number(tokenId)
           const JsonData = JSON.stringify(uridata.data)
           const _data = { userid: userId, nftid: newtokenId, nftidToken, nftUridata: JsonData }
-          console.log(_data)
+          // console.log(_data)
           const data = await axios.post(`${BaseUrl}/createusernft`, _data)
-          console.log(data)
+          // console.log(data)
           dispatch({ type: "Loading", payload: false })
         } catch (error) {
           alert("NFT 추가 오류" + error)
         }
       }
-      // console.log('GG', data, Eventlog)
+      console.log('GG', data, Eventlog)
       navigate('/mypage')
       return Eventlog
 
@@ -487,7 +485,7 @@ const Mainpage = () => {
     const mintCallData = TokenContract.interface.encodeFunctionData("mint", [smartAcc, amount])
     const events = await EntryPointContract.on("UserOpCompleted")
 
-    console.log("nonce", events)
+    // console.log("nonce", events)
     const callData = SmartAccountContract.interface.encodeFunctionData("execute", [
       process.env.REACT_APP_BING_TKN_CA,
       value,
@@ -495,15 +493,15 @@ const Mainpage = () => {
     ])
     const response = await sendEntryPoint(smartAcc, EntryPointContract, callData, signer)
 
-    
+
     await TokenContract.on('minted', async (address, amount) => {
       const balance = await TokenContract.balanceOf(smartAcc)
       const newBalance = ethers.formatEther(balance)
       setUserBalance(newBalance)
       dispatch({ type: "Loading", payload: false })
       await queryClient.invalidateQueries({ queryKey: ["user"] })
-      console.log("response mainpage", newBalance, response)
-      console.log(address, amount)
+      // console.log("response mainpage", newBalance, response)
+      // console.log(address, amount)
     })
 
     // await new Promise((resolve, reject) => {
@@ -572,52 +570,43 @@ const Mainpage = () => {
     dispatch({ type: "Loading", payload: true })
     const result = await axios.post(`${BaseUrl}/buynft`, data)
 
-    console.log(result, "buynft")
+    // console.log(result, "buynft")
     const { data: Deletedata } = await axios.delete(`${BaseUrl}/sellnft`, { data: _data })
     const result2 = await axios.post(`${BaseUrl}/contractbuynft`, data)
 
     const amount = ethers.parseEther(`${price}`, 18)
-    console.log({ sender, nftid, nftUridata, nftidToken, price, amount })
+    // console.log({ sender, nftid, nftUridata, nftidToken, price, amount })
 
     const mintCallData = TokenContract.interface.encodeFunctionData("transfer(address,uint256)", [sender, amount])
-    const events = await EntryPointContract.on("UserOpCompleted")
+    // const events = await EntryPointContract.on("UserOpCompleted")
 
-    console.log("nonce", events)
+    // console.log("nonce", events)
     const callData = SmartAccountContract.interface.encodeFunctionData("execute", [
       process.env.REACT_APP_BING_TKN_CA,
       value,
       mintCallData,
     ])
-    const response = await sendEntryPoint(smartAcc, EntryPointContract, callData, signer)
-    console.log("GGG")
-    await new Promise((resolve, reject) => {
-      const listener = async (owner, value) => {
-        if (owner.toLowerCase() === smartAcc.toLowerCase()) {
-          const balance = await TokenContract.balanceOf(smartAcc)
-          const newBalance = ethers.formatEther(balance)
-          setUserBalance(newBalance)
 
-          console.log("Minted:", owner, value.toString())
-          console.log("response mainpage", newBalance, response)
-          TokenContract.off("Transfer", listener) // Clean up the listener
-          resolve()
-        }
-      }
-      setTimeout(() => {
-        TokenContract.off("Transfer", listener)
-        reject(new Error("Timeout: 'Transfer' event not received"))
-      }, 100000) // 30 seconds
-      TokenContract.on("Transfer", listener)
+    const response = await sendEntryPoint(smartAcc, EntryPointContract, callData, signer)
+    await TokenContract.on('Transfer', async (address, amount) => {
+      const balance = await TokenContract.balanceOf(smartAcc)
+      const newBalance = ethers.formatEther(balance)
+      setUserBalance(newBalance)
+      alert("NFT 구매 완료 되었습니다")
+      dispatch({ type: "Loading", payload: false })
+      await queryClient.invalidateQueries({ queryKey: ["user"] })
+      // navigate('/mypage')
     })
-    alert("NFT 구매 완료 되었습니다")
-    dispatch({ type: "Loading", payload: false })
-    await queryClient.invalidateQueries({ queryKey: ["user"] })
-    navigate('/mypage')
+
+    // alert("NFT 구매 완료 되었습니다")
+    // dispatch({ type: "Loading", payload: false })
+    // await queryClient.invalidateQueries({ queryKey: ["user"] })
+    // navigate('/mypage')
   }
 
   const LogoutHandler = () => {
     dispatch({ type: "logout" }) // This will clear userId and user too
-    console.log("zz")
+    // console.log("zz")
     navigate('/')
   }
 
@@ -675,6 +664,10 @@ const Mainpage = () => {
               <InfoValue>{userId}</InfoValue>
             </InfoItem>
             <InfoItem>
+              <InfoLabel>잔액</InfoLabel>
+              <InfoValue>{userBalance ? userBalance : 0} BTK</InfoValue>
+            </InfoItem>
+            <InfoItem>
               <InfoLabel>Public Key</InfoLabel>
               <InfoValue>{userInfo?.UserAddress}</InfoValue>
             </InfoItem>
@@ -682,14 +675,11 @@ const Mainpage = () => {
               <InfoLabel>Smart Account</InfoLabel>
               <InfoValue>{userInfo?.smartAcc}</InfoValue>
             </InfoItem>
-            <InfoItem>
-              <InfoLabel>잔액</InfoLabel>
-              <InfoValue>{userBalance ? userBalance : 0} BTK</InfoValue>
-            </InfoItem>
-            <InfoItem>
+
+            {/* <InfoItem>
               <InfoLabel>화이트리스트</InfoLabel>
               <InfoValue>{userInfo?.checkWhitelist === true ? "true" : "false"}</InfoValue>
-            </InfoItem>
+            </InfoItem> */}
           </UserInfoGrid>
         </Card>
 

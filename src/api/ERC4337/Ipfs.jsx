@@ -25,10 +25,8 @@ const uploadIPFS = async ({formdata, nftName, nftDesc}) => {
         // await transaction.wait();
         // try {
         //     const ownerTokens = await ContractMetaNFT.getAllTokenBalances(signer.address);
-        //     console.log('Owner tokens:', ownerTokens, data);
         //     return ({ image: `http://gateway.pinata.cloud/ipfs/${data.IpfsHash}`, data })
         // } catch (error) {
-        //     console.log('Error calling ownerToken:', error.message);
         // }
 
     } catch (error) {
@@ -54,7 +52,6 @@ const uploadJsonMetadataIPFS = async (name, description, image) => {
             pinata_secret_api_key
         }
     })
-    console.log(data.IpfsHash, 'hash')
     return data.IpfsHash
 }
 
@@ -63,9 +60,7 @@ const uploadJsonMetadataIPFS = async (name, description, image) => {
 const SellNft = async (contractNFT, contractMetaNft, signer, paymaster, nftid, token, price) => {
     if (!paymaster) return;
     const addrs = await contractMetaNft.getAddress()
-    // console.log('items', addrs, signer.address, paymaster, nftid, token, price)
     const checknfttokens = await (contractNFT.balanceOf(signer.address, nftid))
-    console.log(checknfttokens, 'checknfttokens')
     const reCharge = await paymaster.sendTransaction({
         to: signer.address,
         value: ethers.parseEther("0.0015")
@@ -99,7 +94,6 @@ const userNft = async (userAddress, contractNFT) => {
         }
         return ObjectNfts;
     } catch (error) {
-        console.log('usernft', error)
     }
 }
 
@@ -111,7 +105,6 @@ const getAllListedNftids = async (contractNft) => {
             address: el[0],
             nftId: el[1]
         })))
-        console.log(newData, "selldata")
         return newData
 
     } catch (error) {

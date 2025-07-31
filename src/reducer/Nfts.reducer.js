@@ -9,7 +9,6 @@ export const NftsReducer = (state = initialState, action) => {
     switch(type) {
         case "nftDatas" : {
             state = [...action.payload]
-            console.log(state, "NftsReducer")
             return state
         }
         default : {
