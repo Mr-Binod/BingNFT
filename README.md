@@ -179,6 +179,7 @@ test & contract deployment
 - 사용자의 정보, NFT정보, 판매 NFT LIST들이 DATABASE 에 저장했습니다
 - 백엔드는 NESTJS 사용했고 프론트는 REACT 사요하고 CONTRACT는 SOLIDITY 사용해서 구현하게 되었습니다.
 - 프론트는 보기 쉽고 심플하게 구현 했습니다
+- chain 에 논스 켭치기 않기 위해 컨트랙트 처리 될때까지 로딩 처리
 
 ### 문제점 및 해결
 - ERC4337 사용해서 ERC1155 로직을 호출할때 에러가 발생했고 구현이 어려웠습니다
