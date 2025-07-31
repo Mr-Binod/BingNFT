@@ -421,7 +421,7 @@ const Mypage = () => {
     <Container>
       <Header>
         <HeaderContent>
-          <Link to='/main'><Logo>BingNFT Platform</Logo></Link>
+          <Link to='/main'><Logo>ZunoNFT Platform</Logo></Link>
           <Navigation>
             <NavLink to="/main">메인페이지</NavLink>
             <LogoutButton onClick={LogoutHandler}>로그아웃</LogoutButton>

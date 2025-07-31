@@ -410,8 +410,8 @@ const Mainpage = () => {
 
       console.log(nftname.value, nftdesc.value, File)
       if (!nftname.value.trim() || !nftdesc.value.trim() || !File) {
-        alert("모든 필드를 채워주세요.");
-        return;
+        
+        return alert("모든 필드를 채워주세요.");
       }
       const nftName = nftname.value
       const nftDesc = nftdesc.value
@@ -626,7 +626,7 @@ const Mainpage = () => {
     <Container>
       <Header>
         <HeaderContent>
-          <Link to='/main'><Logo>BingNFT Platform</Logo></Link>
+          <Link to='/main'><Logo>ZunoNFT Platform</Logo></Link>
           <Navigation>
             <NavLink to="/mypage">마이페이지</NavLink>
             <LogoutButton onClick={LogoutHandler}>로그아웃</LogoutButton>
