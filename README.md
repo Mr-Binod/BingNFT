@@ -1,12 +1,7 @@
 
 
 # ZunoNFT
-<!-- <div   width="150px" height="150px">
-<img src='./newbingfront/myapp/src/images/icons/notionarylogo.png' style="background-color:white;width:150px;" >
-
-</div> -->
-
-
+<h2><a href="https://bing-nft.vercel.app/" style="color: lightblue;">ZunoNFT 사이트 이동</a></h2>
 
 # 목차
 - [프로젝트 소개](#프로젝트-소개)
@@ -36,14 +31,14 @@ ZunoNFT는 블록체인에서 계정 추상화 erc4337 로직 사용해서 사�
 
 
 ## 화면 구성 :
-<label>웤크스페이스 폴더 생성</label>
-<img src="./newbingfront/myapp/public/images/createworkspace-ezgif.com-speed.gif"><br><br>
-<label>페이지 생성</label>
-<img src="./newbingfront/myapp/public/images/createpage-ezgif.com-speed.gif"><br><br>
-<label>워크스페이스 기능</label>
-<img src="./newbingfront/myapp/public/images/functionsws.gif"><br><br>
-<label>삭제 기능</label>
-<img src="./newbingfront/myapp/public/images/deletews-ezgif.com-speed.gif">
+<label >회원 가입 (블록에 기록 되기때문에 시간 좀 소요됩니다)</label> </br> 
+<img src="./src/images/signup.gif"><br><br>
+<label>NFT 생성</label></br>
+<img src="./src/images/nftUpload.gif"></br></br>
+<label>NFT 판매</label></br>
+<img src="./src/images/sellnft.gif"><br><br>
+<label>NFT 구매</label></br>
+<img src="./src/images/buynft.gif"></br>
 
 
 
@@ -56,7 +51,6 @@ ZunoNFT는 블록체인에서 계정 추상화 erc4337 로직 사용해서 사�
 - 마이 페이지 : 사용자의 정보, 소유하고 있는 NFT, 판매중이 NFT 확인하고 판매 NFT 취소 기능
 
 ## API 문서 
-## 📘 API 명세서
 
 ### 📥 GET 요청
 
