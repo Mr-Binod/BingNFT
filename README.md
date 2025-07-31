@@ -1,70 +1,189 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+# Zuno
+<!-- <div   width="150px" height="150px">
+<img src='./newbingfront/myapp/src/images/icons/notionarylogo.png' style="background-color:white;width:150px;" >
 
-In the project directory, you can run:
+</div> -->
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+# 목차
+- [프로젝트 소개](#프로젝트-소개)
+- [개인 프로젝트](#팀원-소개)
+- [화면 구성](#화면-구성)
+- [주요 기능](#주요-기능)
+- [개발 기간](#개발-기간)
+- [기술 스택](#기술-스택)
+- [협업 도구](#협업-도구-communication)
+- [테이블 구성](#테이블-구성)
+---
 
-### `npm test`
+## 개발 기간
+- 2025-07-21 ~ 2025-07-25 (5일)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 프로젝트 소개
+Notionary는 워크스페이스 공간 제공해주고, 사용자들이 질문과 의견을 낼수 있는 소통 공간으로 개발하게 됬습니다. 여기에서는 우리가 워크스페이스를 정리하면서 카태고리별로 굼금한 글과 질문을 작성할수 있습니다. 글을 작성할때 본인의 워크스페이스를 공유하면서 질문과 응답을 받을수도 있습니다.
+---
 
-### `npm run build`
+## 팀원 소개 
+<div>
+<img src="https://github.com/Mr-Binod.png" width="80px"><br>
+<a href="https://github.com/Mr-Binod">팀원 : 비노드 </a><br>
+역활활 : 워크스페이시 페이지 구현
+</div>
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 화면 구성 :
+<label>웤크스페이스 폴더 생성</label>
+<img src="./newbingfront/myapp/public/images/createworkspace-ezgif.com-speed.gif"><br><br>
+<label>페이지 생성</label>
+<img src="./newbingfront/myapp/public/images/createpage-ezgif.com-speed.gif"><br><br>
+<label>워크스페이스 기능</label>
+<img src="./newbingfront/myapp/public/images/functionsws.gif"><br><br>
+<label>삭제 기능</label>
+<img src="./newbingfront/myapp/public/images/deletews-ezgif.com-speed.gif">
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 주요 기능
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 담당 : Zuno 프로젝트
+- 로그인 페이지 : 사용자가 회원가입하면 ERC4337로 wallet 생성해서 smart Account 생성 
+- 메인 페이지 :메인 페이지에서 사용자 정보 아이디, 공개키, 잔액, NFT 구매 기능. 사용자가 토큰 바랭하면 1000BTK 발앻 및 nft 생성 기능
+- 마이 페이지 : 사용자의 정보, 소유하고 있는 NFT, 판매중이 NFT 확인하고 판매 NFT 취소 기능
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## API 문서 
+get  : /account   전체 계정 조회
+get  : /account/:id   id 사용자 계정 조회
+get  : /userop  mempool 조회
+get : /wallet
 
-## Learn More
+post : /account   계정 생성
+post : /createnft  NFT 생성 
+post : /userop  entrypoing 호출
+post : /wallet  wallet 생성
+post : /nft   nft 생성
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+delete : /checkzero  nft 수량 0 이며 삭제
 
-### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 기술 스택 
+### FRONTEND
 
-### Analyzing the Bundle Size
+<table>
+  <tr>
+    <td align="center">
+      <img src="./newbingfront/myapp/public/images/react.png" width="200px"><br>
+      <label>React</label>
+    </td>
+    <td align="center">
+      <img src="./newbingfront/myapp/public/images/html-5_5968267.png" width="200px"><br>
+      <label>HTML5</label>
+    </td>
+    <td align="center">
+      <img src="./newbingfront/myapp/public/images/css.png" width="200px"><br>
+      <label>CSS</label>
+    </td>
+    <td align="center">
+      <img src="./newbingfront/myapp/public/images/js_5968292.png" width="200px"><br>
+      <label>JavaScript</label>
+    </td>
+  </tr>
+</table>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### BACKEND
+<table>
+  <tr>
+    <td align="center">
+      <img src="./newbingfront/myapp/public/images/js_5968292.png" width="200px"><br>
+      <label>JavaScript</label>
+    </td>
+    <td align="center">
+      <img src="./newbingfront/myapp/public/images/mysql.png" width="200px"><br>
+      <label>MySQL</label>
+    </td>
+    <td align="center">
+      <img src="./newbingfront/myapp/public/images/nodejs.256x157.png" width="200px"><br>
+      <label>Node.js</label>
+    </td>
+    <td align="center">
+      <img src="./newbingfront/myapp/public/images/express.png" width="200px"><br>
+      <label>Express</label>
+    </td>
+  </tr>
+</table>
 
-### Making a Progressive Web App
+### 협업 도구 COMMUNICATION 
+<table>
+  <tr>
+    <td align="center">
+      <img src="./newbingfront/myapp/public/images/github_2504911.png" width="200px"><br>
+      <label>GitHub</label>
+    </td>
+    <td align="center">
+      <img src="./newbingfront/myapp/public/images/Notion.png" width="200px"><br>
+      <label>Notion</label>
+    </td>
+  </tr>
+</table>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-### Advanced Configuration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-### Deployment
+### 프론트 폴더 구조
+---
+📦Notionary
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+┣ 📂 dapp 프론트
 
-### `npm run build` fails to minify
+┣ 📂src
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+    ┣ 📂 API
+
+    ┣ 📂 Components
+
+    ┣ 📂 css
+
+    ┣ 📂 Hooks
+
+    ┣ 📂 images
+
+    ┣ 📂 Reducer
+
+    ┣ 📂 Store
+  
+ ┣ 📜 App.js
+
+ ┣ 📜 index.js
+
+ ┣ 📜 package-lock.json
+
+ ┣ 📜 package.json
+
+
+### 백엔드 폴더 구조
+---
+┣ 📂 백엔드
+
+┣ 📂controllers
+
+┣ 📂middlewares
+
+┣ 📂models
+
+┣ 📂public
+
+┣ 📂routers
+
+┣ 📂script
+  
+ ┣ 📜 App.js
+
+ ┣ 📜 index.js
+
+ ┣ 📜 package-lock.json
+
+ ┣ 📜 package.json

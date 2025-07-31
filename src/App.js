@@ -11,14 +11,15 @@ function App() {
     <div className="App">
       <BrowserRouter>
 
-        {!islogin ?
+        {/* {!islogin ? */}
           <Routes>
             <Route path="/" element={<Newpage />} />
-          </Routes> :
-          <Routes>
+          {/* </Routes> :
+          <Routes> */}
             <Route path="/main" element={<Mainpage />} />
             <Route path="/mypage" element={<Mypage />} />
-          </Routes>}
+          </Routes>
+          {/* } */}
       </BrowserRouter>
     </div>
   );

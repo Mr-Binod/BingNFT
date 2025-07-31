@@ -626,7 +626,7 @@ const Mainpage = () => {
     <Container>
       <Header>
         <HeaderContent>
-          <Logo>BingNFT Platform</Logo>
+          <Link to='/main'><Logo>BingNFT Platform</Logo></Link>
           <Navigation>
             <NavLink to="/mypage">마이페이지</NavLink>
             <LogoutButton onClick={LogoutHandler}>로그아웃</LogoutButton>
@@ -666,6 +666,7 @@ const Mainpage = () => {
       )}
 
       <Content>
+        <h2>메인 페이지</h2>
         <Card>
           <SectionTitle>사용자 정보</SectionTitle>
           <UserInfoGrid>

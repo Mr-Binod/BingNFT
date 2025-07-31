@@ -421,7 +421,7 @@ const Mypage = () => {
     <Container>
       <Header>
         <HeaderContent>
-          <Logo>BingNFT Platform</Logo>
+          <Link to='/main'><Logo>BingNFT Platform</Logo></Link>
           <Navigation>
             <NavLink to="/main">메인페이지</NavLink>
             <LogoutButton onClick={LogoutHandler}>로그아웃</LogoutButton>
@@ -447,7 +447,7 @@ const Mypage = () => {
             </ModalContent>
           </Modal>
         )}
-
+        <h2>메인 페이지</h2>
         <Card>
           <SectionTitle>사용자 정보</SectionTitle>
           <UserInfoGrid>
