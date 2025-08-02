@@ -155,7 +155,7 @@ const getAllListedNftids = async (contractNft) => {
     if (!contractNft) return;
     try {
         await delay(1000)
-        const data = await contractNft.getAllListedNFTIds()
+        const data = await contractNft?.getAllListedNFTIds()
         await delay(1000)
         const newData = await Promise.all(data?.map((el) => ({
             address: el[0],

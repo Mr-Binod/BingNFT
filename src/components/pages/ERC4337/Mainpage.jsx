@@ -1314,21 +1314,14 @@ const Mainpage = () => {
       const { smartAcc } = userInfo
 
       const mintCallData = TokenContract.interface.encodeFunctionData("mint", [smartAcc, amount])
-      // const events = await EntryPointContract.on("UserOpCompleted")
-
-      // console.log("nonce", events)
       const callData = SmartAccountContract.interface.encodeFunctionData("execute", [
         process.env.REACT_APP_BING_TKN_CA,
         value,
         mintCallData,
-      ])
-      
-      // Add delay to prevent rate limiting
+      ]) 
       await new Promise(resolve => setTimeout(resolve, 2000))
-      
       const response = await sendEntryPoint(smartAcc, EntryPointContract, callData, signer)
-
-      await TokenContract?.on('minted', async (address, amount) => {
+      await TokenContract.on('minted', async (address, amount) => {
         try {
           // Add delay before balance check
           await new Promise(resolve => setTimeout(resolve, 1000))
@@ -1338,7 +1331,7 @@ const Mainpage = () => {
           dispatch({ type: "Loading", payload: false })
           await queryClient.invalidateQueries({ queryKey: ["user"] })
           // console.log("response mainpage", newBalance, response)
-          // console.log(address, amount)
+          console.log(address, amount)
         } catch (error) {
           console.error('Error in minted event handler:', error)
           dispatch({ type: "Loading", payload: false })

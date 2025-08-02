@@ -562,20 +562,35 @@ const Mypage = () => {
   })
 
   useEffect(() => {
-    const { TokenContract } = Contracts
-    if (!Contracts || !userinfo?.smartAcc) return
+    const { TokenContract } = Contracts;
     (async () => {
-      const balance = await TokenContract.balanceOf(userinfo.smartAcc)
-      const newBalance = Math.floor(Number(ethers.formatEther(balance)))
-      setBalance(newBalance)
-      const { data } = await axios.get(`${BaseUrl}/user/${userId}`)
-      const parsedData = data.message.map((el, i) => {
-        const newNftUridata = JSON.parse(el.nftUridata)
-        return { ...el, nftUridata: newNftUridata }
-      })
-      setUserNfts(parsedData)
+      // Check if smart account address is valid before making contract calls
+      if (Contracts && userinfo?.smartAcc && userinfo.smartAcc !== "0x" && userinfo.smartAcc.length >= 42) {
+        try {
+          const balance = await TokenContract?.balanceOf(userinfo.smartAcc)
+          
+          const newBalance = Math.floor(Number(ethers.formatEther(balance)))
+          setBalance(newBalance)
+          const { data } = await axios.get(`${BaseUrl}/user/${userId}`)
+          const parsedData = data.message.map((el, i) => {
+            const newNftUridata = JSON.parse(el.nftUridata)
+            return { ...el, nftUridata: newNftUridata }
+          })
+          setUserNfts(parsedData)
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          // Set default values on error
+          setBalance(0);
+          setUserNfts([]);
+        }
+      } else {
+        console.log('Invalid smart account address or contracts not ready:', userinfo?.smartAcc);
+        // Set default values when address is invalid
+        setBalance(0);
+        setUserNfts([]);
+      }
     })()
-  }, [Contracts, sellLists])
+  }, [Contracts, sellLists, userinfo])
 
   const sellNft = async (e) => {
     e.preventDefault()

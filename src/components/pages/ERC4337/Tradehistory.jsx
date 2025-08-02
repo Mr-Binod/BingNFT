@@ -532,102 +532,104 @@ const Tradehistory = () => {
     queryKey: ['trade', currentPage, activeFilter, timeFilter, debouncedSearchQuery],
     queryFn: async () => {
       try {
-        if (!Contracts.NftContract || !userinfo?.smartAcc) {
-          return [];
-        }
-        setEvents([])
-         const balance = await Contracts.TokenContract.balanceOf(userinfo.smartAcc)
-         const newBalance = Math.floor(Number(ethers.formatEther(balance)))
-         setBalance(newBalance)
-        const filter = Contracts.NftContract.filters.history();
-        const allEvents = await Contracts.NftContract.queryFilter(filter, 0, "latest")
-        
-        // Process all events first
-        const allEventData = []
-        for (const event of allEvents) {
-            const {from,to,id,amount,price,trade, uri} = event.args
-          console.log('Raw trade value from blockchain:', trade)
+        setLoading(true)
+        if (Contracts.NftContract && userinfo.smartAcc && userinfo.smartAcc !== "0x" && userinfo.smartAcc.length >= 42) {
+
+          setEvents([])
+          const balance = await Contracts.TokenContract.balanceOf(userinfo?.smartAcc)
+          const newBalance = Math.floor(Number(ethers.formatEther(balance)))
+          setBalance(newBalance)
+          const filter = Contracts.NftContract.filters.history();
+          const allEvents = await Contracts.NftContract.queryFilter(filter, 0, "latest")
+
+          // Process all events first
+          const allEventData = []
+          for (const event of allEvents) {
+            const { from, to, id, amount, price, trade, uri } = event.args
+            console.log('Raw trade value from blockchain:', trade)
             const uridata = await axios.get(`https://gateway.pinata.cloud/ipfs/${uri}`, {
               timeout: 1000 // 5 second timeout
             });
             const imgpath = uridata.data.image.replace("ipfs://", "https://gateway.pinata.cloud/ipfs/");
             const newUridata = uridata.data;
             newUridata.image = imgpath;
-            const change = (price/amount)
-          
-          // Add timestamp to the event data
-          const timestamp = event.blockNumber ? await event.getBlock().then(block => block.timestamp) : Date.now() / 1000
-          allEventData.push({ from,to,id,amount,price,trade,change, newUridata, timestamp })
+            const change = (price / amount)
+
+            // Add timestamp to the event data
+            const timestamp = event.blockNumber ? await event.getBlock().then(block => block.timestamp) : Date.now() / 1000
+            allEventData.push({ from, to, id, amount, price, trade, change, newUridata, timestamp })
+          }
+
+          // Filter all events based on activeFilter, timeFilter, and debouncedSearchQuery
+          const filteredEvents = allEventData.filter(trade => {
+            console.log('Trade data:', trade.trade, 'Filter:', activeFilter, 'TimeFilter:', timeFilter, 'Search:', debouncedSearchQuery)
+
+            // First filter by trade type
+            let passesTradeFilter = false
+            if (activeFilter === 'all') passesTradeFilter = true
+            else if (activeFilter === 'completed') passesTradeFilter = trade.trade === 'buy'
+            else if (activeFilter === 'pending') passesTradeFilter = trade.trade === 'sell'
+            else if (activeFilter === 'failed') passesTradeFilter = trade.trade === 'cancel'
+            else if (activeFilter === 'minted') passesTradeFilter = trade.trade === 'mint'
+
+            if (!passesTradeFilter) return false
+
+            // Then filter by time
+            const now = Math.floor(Date.now() / 1000)
+            const tradeTime = trade.timestamp
+            const timeDiff = now - tradeTime
+
+            console.log(`Trade time: ${new Date(tradeTime * 1000).toLocaleString()}, Time diff: ${timeDiff} seconds, Filter: ${timeFilter}`)
+
+            let passesTimeFilter = false
+            if (timeFilter === 'all') passesTimeFilter = true
+            else if (timeFilter === '24h') passesTimeFilter = timeDiff <= 24 * 60 * 60
+            else if (timeFilter === '7d') passesTimeFilter = timeDiff <= 7 * 24 * 60 * 60
+            else if (timeFilter === '30d') passesTimeFilter = timeDiff <= 30 * 24 * 60 * 60
+
+            console.log(`Time filter result: ${passesTimeFilter}`)
+
+            if (!passesTimeFilter) return false
+
+            // Finally filter by search query
+            if (debouncedSearchQuery.trim() === '') return true
+
+            const nftName = trade.newUridata?.name || ''
+            const searchLower = debouncedSearchQuery.toLowerCase()
+            const nameLower = nftName.toLowerCase()
+
+            const passesSearchFilter = nameLower.includes(searchLower)
+            console.log(`Search filter: "${nftName}" includes "${debouncedSearchQuery}" = ${passesSearchFilter}`)
+
+            return passesSearchFilter
+          })
+
+          // Sort filtered events by timestamp in descending order (latest first)
+          const sortedEvents = filteredEvents.sort((a, b) => b.timestamp - a.timestamp)
+
+          console.log(`Sorted ${sortedEvents.length} events by timestamp (latest first)`)
+          if (sortedEvents.length > 0) {
+            console.log(`Latest event: ${new Date(sortedEvents[0].timestamp * 1000).toLocaleString()}`)
+            console.log(`Oldest event: ${new Date(sortedEvents[sortedEvents.length - 1].timestamp * 1000).toLocaleString()}`)
+          }
+
+          // Paginate the sorted results
+          const startIndex = (currentPage - 1) * eventsPerPage
+          const endIndex = startIndex + eventsPerPage
+          const pageEvents = sortedEvents.slice(startIndex, endIndex)
+
+          // Set the page events
+          setEvents(pageEvents)
+          setTotalEvents(sortedEvents.length)
+          setTotalPages(Math.ceil(sortedEvents.length / eventsPerPage))
+          setLoading(false)
+          return pageEvents
         }
-        
-        // Filter all events based on activeFilter, timeFilter, and debouncedSearchQuery
-        const filteredEvents = allEventData.filter(trade => {
-          console.log('Trade data:', trade.trade, 'Filter:', activeFilter, 'TimeFilter:', timeFilter, 'Search:', debouncedSearchQuery)
-          
-          // First filter by trade type
-          let passesTradeFilter = false
-          if (activeFilter === 'all') passesTradeFilter = true
-          else if (activeFilter === 'completed') passesTradeFilter = trade.trade === 'buy'
-          else if (activeFilter === 'pending') passesTradeFilter = trade.trade === 'sell'
-          else if (activeFilter === 'failed') passesTradeFilter = trade.trade === 'cancel'
-          else if (activeFilter === 'minted') passesTradeFilter = trade.trade === 'mint'
-          
-          if (!passesTradeFilter) return false
-          
-          // Then filter by time
-          const now = Math.floor(Date.now() / 1000)
-          const tradeTime = trade.timestamp
-          const timeDiff = now - tradeTime
-          
-          console.log(`Trade time: ${new Date(tradeTime * 1000).toLocaleString()}, Time diff: ${timeDiff} seconds, Filter: ${timeFilter}`)
-          
-          let passesTimeFilter = false
-          if (timeFilter === 'all') passesTimeFilter = true
-          else if (timeFilter === '24h') passesTimeFilter = timeDiff <= 24 * 60 * 60
-          else if (timeFilter === '7d') passesTimeFilter = timeDiff <= 7 * 24 * 60 * 60
-          else if (timeFilter === '30d') passesTimeFilter = timeDiff <= 30 * 24 * 60 * 60
-          
-          console.log(`Time filter result: ${passesTimeFilter}`)
-          
-          if (!passesTimeFilter) return false
-          
-          // Finally filter by search query
-          if (debouncedSearchQuery.trim() === '') return true
-          
-          const nftName = trade.newUridata?.name || ''
-          const searchLower = debouncedSearchQuery.toLowerCase()
-          const nameLower = nftName.toLowerCase()
-          
-          const passesSearchFilter = nameLower.includes(searchLower)
-          console.log(`Search filter: "${nftName}" includes "${debouncedSearchQuery}" = ${passesSearchFilter}`)
-          
-          return passesSearchFilter
-        })
-        
-        // Sort filtered events by timestamp in descending order (latest first)
-        const sortedEvents = filteredEvents.sort((a, b) => b.timestamp - a.timestamp)
-        
-        console.log(`Sorted ${sortedEvents.length} events by timestamp (latest first)`)
-        if (sortedEvents.length > 0) {
-          console.log(`Latest event: ${new Date(sortedEvents[0].timestamp * 1000).toLocaleString()}`)
-          console.log(`Oldest event: ${new Date(sortedEvents[sortedEvents.length - 1].timestamp * 1000).toLocaleString()}`)
-        }
-        
-        // Paginate the sorted results
-        const startIndex = (currentPage - 1) * eventsPerPage
-        const endIndex = startIndex + eventsPerPage
-        const pageEvents = sortedEvents.slice(startIndex, endIndex)
-        
-        // Set the page events
-        setEvents(pageEvents)
-        setTotalEvents(sortedEvents.length)
-        setTotalPages(Math.ceil(sortedEvents.length / eventsPerPage))
-        return pageEvents
       } catch (error) {
         console.error('Error fetching events:', error);
         // Fallback to mock data on error
         setTradeHistory([]);
-        // setLoading(false);
+        setLoading(false);
         return [];
       }
     },
@@ -655,12 +657,10 @@ const Tradehistory = () => {
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['trade'] })
-  },[userinfo])
-
+  }, [userinfo])
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage)
-
   }
 
 
@@ -674,20 +674,14 @@ const Tradehistory = () => {
     console.log('Time filter changed to:', timeFilter)
     // Reset to page 1 when time filter changes
     setCurrentPage(1)
-  }, [timeFilter])
+  }, [timeFilter, debouncedSearchQuery])
 
-  useEffect(() => {
-    console.log('Search query changed to:', debouncedSearchQuery)
-    // Reset to page 1 when search query changes
-    setCurrentPage(1)
-  }, [debouncedSearchQuery])
 
   const LogoutHandler = () => {
     dispatch({ type: "logout" })
     navigate('/')
   }
 
-  // Use events directly since filtering is now done in the query
   const filteredHistory = events
 
   return (
@@ -735,9 +729,9 @@ const Tradehistory = () => {
           </HeaderLeft>
           <HeaderCenter>
             <SearchBar>
-              <input 
-                type="text" 
-                placeholder="Search NFT names..." 
+              <input
+                type="text"
+                placeholder="Search NFT names..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -831,13 +825,13 @@ const Tradehistory = () => {
               <div>Status</div>
             </TableHeader>
 
-            {isLoading ? (
+            {loading ? (
               <div style={{ padding: '40px', textAlign: 'center', color: '#a0aec0' }}>
                 Loading trade history...
               </div>
             ) : filteredHistory.length > 0 ? (
-              filteredHistory.map((trade, i) => (
-                
+              filteredHistory?.map((trade, i) => (
+
                 <TableRow key={i}>
                   <RankNumber rank={trade.rank}>#{((currentPage - 1) * eventsPerPage) + i + 1}</RankNumber>
                   <NFTInfo>
@@ -874,7 +868,7 @@ const Tradehistory = () => {
           </TradeHistoryTable>
 
           {/* Pagination Controls */}
-          { filteredHistory.length > 0 && totalPages > 1 && (
+          {filteredHistory.length > 0 && totalPages > 1 && (
             <PaginationContainer>
               <PaginationButton
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}

@@ -8,6 +8,7 @@ const getUsersInfos = async () => {
 
 const getUserInfo = async (userid, userpw) => {
     const {data} = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/account/${userid}`)
+    console.log(data)
     if (data.state !== 201) return alert('아이디를 일치하지 않습니다')
     if(userpw !== data.message.userpw) return alert('비밀번호 일치하지않습니다')
     return data
