@@ -12,7 +12,7 @@ const getUserInfo = async (userid, userpw) => {
     if(userpw !== data.message.userpw) return alert('비밀번호 일치하지않습니다')
     return data
 }
-const getUserInfoCreate = async (userid) => {
+const getUserInfoOne = async (userid) => {
     const {data} = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/account/${userid}`)
     // if (data.state !== 201) return alert('아이디를 일치하지 않습니다')
     // if(userpw !== data.message.userpw) return alert('비밀번호 일치하지않습니다')
@@ -23,7 +23,7 @@ const CreateAcc = async (data) => {
     if(data.userpw.length < 4) {
         alert('비밀번호 4개 이상 입력해주세요')
         return {state : 406}}
-    const result = await getUserInfoCreate(data.id)
+    const result = await getUserInfoOne(data.id)
     if(result.state === 201) return result
     const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/account`, data) 
     return response.data
@@ -40,4 +40,4 @@ const CheckZero = async () => {
 }
 
 
-export {getUsersInfos, CreateAcc, getUserInfo, CreateNft, getUserInfoCreate, CheckZero}
+export {getUsersInfos, CreateAcc, getUserInfo, CreateNft, getUserInfoOne, CheckZero}

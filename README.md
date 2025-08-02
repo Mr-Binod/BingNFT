@@ -188,9 +188,39 @@ test & contract deployment
 - ENV 로직 호출, 데이터베이스 설게, 의존성 주입, 타입 정의 같은 불편함을 저리하면서 환성하였습니다
 - 회원 가입으나 거래할때 시간좀 걸리고 사용자가 이탈한 불편함
 
-### 아프로 계획
+### 계획
 - 가입이나 거래 로직을 실행할때 소요된 시간 컨트랙트에서 처리된 부분과 UI쪽에서 다르고 유저가 빠르게 볼수 있게 할 예정
 - 스왑 기능 주가 예정
 - 화면 디자인 더 예쁘게 디자인 할 예정
 - 토큰 발행기능을 저움에 무료하고 3 번지나면 유로로 할 예정
 - 거래가되면 수수료 확보할 예정 
+
+
+
+
+ //                         try {
+    //                             // Add delay between IPFS requests
+    //                             if (i > 0) await new Promise(resolve => setTimeout(resolve, 200));
+                                
+    //                             const uridata = await axios.get(`https://gateway.pinata.cloud/ipfs/${imgInfo}`, {
+    //                                 timeout: 5000 // 5 second timeout
+    //                             });
+    //                             const imgpath = uridata.data.image.replace("ipfs://", "https://gateway.pinata.cloud/ipfs/");
+    //                             const newUridata = uridata.data;
+    //                             newUridata.image = imgpath;
+                                
+    //                             console.log(`Processed event ${i + 1}/${successfulEvents.length}:`, { from, to, id, value, newUridata });
+    //                             throttledSetEvents({ from, to, id, value, imgData: newUridata });
+    //                         } catch (ipfsError) {
+    //                             console.error('IPFS fetch error:', ipfsError);
+    //                             throttledSetEvents({ from, to, id, value, imgData: null });
+    //                         }
+    //                     } else {
+    //                         throttledSetEvents({ from, to, id, value, imgData: null });
+    //                     }
+    //                 } catch (eventError) {
+    //                     console.error('Error processing event:', eventError);
+    //                 }
+    //             }
+                
+                return History

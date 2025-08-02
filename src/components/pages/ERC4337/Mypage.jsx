@@ -7,90 +7,274 @@ import { useDispatch, useSelector } from "react-redux"
 import styled from "styled-components"
 import loadingGif from "../../../images"
 import { Link, useNavigate } from "react-router-dom"
-import { CheckZero, getUserInfoCreate } from "../../../api/ERC4337/NewApi"
+import { CheckZero, getUserInfoOne } from "../../../api/ERC4337/NewApi"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 
 const Container = styled.div`
   min-height: 100vh;
-  background: #ffffff;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-`
-
-const Header = styled.header`
-  background: #ffffff;
-  border-bottom: 1px solid #e5e5e5;
-  padding: 16px 24px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-`
-
-const HeaderContent = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  color: white;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `
 
-const Logo = styled.h1`
-  color: #333333;
+const Sidebar = styled.div`
+  height: 100vh;
+  width: 280px;
+  position: fixed;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  box-sizing: border-box;
+
+
+`
+
+const Logo = styled.div`
   font-size: 24px;
-  font-weight: 600;
-  margin: 0;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 40px;
+  text-align: center;
+  letter-spacing: -0.5px;
+  
+  @media (max-width: 768px) {
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
 `
 
-const Navigation = styled.nav`
+const NavMenu = styled.nav`
+  flex: 1;
   display: flex;
-  gap: 16px;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  
+  @media (max-width: 768px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
 `
 
-const NavLink = styled(Link)`
-  color: #374151;
-  text-decoration: none;
+const NavItem = styled.div`
+  padding: 16px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
   font-weight: 500;
-  padding: 8px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.2);
 
   &:hover {
-    background: #f9fafb;
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateX(4px);
   }
 `
 
 const LogoutButton = styled.button`
-  background: #374151;
+  margin-top: auto;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 
   &:hover {
-    background: #1f2937;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
   }
 `
 
+const MainContent = styled.div`
+  flex: 1;
+  margin-left: 280px;
+  padding: 32px 138px;
+  overflow-y: auto;
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+    padding: 16px;
+  }
+`
+
+const Header = styled.header`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  margin-bottom: 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 0;
+  }
+`
+
+const HeaderLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+`
+
+const HeaderCenter = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`
+
+const HeaderRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: space-between;
+  }
+`
+
+const SearchBar = styled.div`
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  width: 300px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  input {
+    background: none;
+    border: none;
+    color: white;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+
+    &::placeholder {
+      color: #a0aec0;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`
+
+const Balance = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+`
+
+const UserProfile = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+  }
+`
+
+const Avatar = styled.div`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+`
+
 const Content = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
+  color: white;
+`
+
+const PageTitle = styled.h1`
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+`
+
+const PageSubtitle = styled.p`
+  font-size: 16px;
+  color: #a0aec0;
+  margin: 0 0 32px 0;
+  line-height: 1.6;
 `
 
 const Card = styled.div`
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
 `
 
 const SectionTitle = styled.h2`
-  color: #333333;
+  color: white;
   font-size: 20px;
   font-weight: 600;
   margin: 0 0 20px 0;
@@ -99,28 +283,31 @@ const SectionTitle = styled.h2`
 const UserInfoGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
+  gap: 20px;
 `
 
 const InfoItem = styled.div`
-  background: #f9fafb;
-  border: 1px solid #e5e5e5;
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   padding: 16px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
 `
 
 const InfoLabel = styled.div`
-  font-size: 12px;
-  color: #6b7280;
+  color: #a0aec0;
+  font-size: 14px;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 `
 
 const InfoValue = styled.div`
+  color: white;
   font-size: 16px;
-  color: #333333;
   font-weight: 600;
   word-break: break-all;
 `
@@ -128,127 +315,131 @@ const InfoValue = styled.div`
 const NFTGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+  gap: 24px;
 `
 
 const NFTCard = styled.div`
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
   overflow: hidden;
-  transition: box-shadow 0.2s ease;
+  transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
   }
 `
 
 const NFTImage = styled.img`
   width: 100%;
-  height: 250px;
+  height: 200px;
   object-fit: cover;
 `
 
 const NFTContent = styled.div`
-  padding: 16px;
+  padding: 20px;
 `
 
 const NFTTitle = styled.h3`
-  color: #333333;
-  font-size: 16px;
+  color: white;
+  font-size: 18px;
   font-weight: 600;
-  margin: 0 0 5px 0;
+  margin: 0 0 12px 0;
 `
 
 const NFTInfo = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  /* margin-bottom: 5px; */
-  font-size: 16px;
-  color: #6b7280;
+  color: #a0aec0;
+  font-size: 14px;
+  margin-bottom: 12px;
 `
 
 const NFTDescription = styled.p`
-  color: #6b7280;
-  font-size: 16px;
-  line-height: 1.5;
-  margin-bottom: 5px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`
-
-const NFTPrice = styled.div`
-  font-size: 16px;
-  font-weight: 600;
-  color: #374151;
-`
-
-const Button = styled.button`
-  background: #374151;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
+  color: #a0aec0;
   font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+`
+
+const ActionButton = styled.button`
   width: 100%;
-  position : relative;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
 
-  &:hover {
-    background: #1f2937;
-  }
+  &.sell {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
 
-  &:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
   }
 
   &.cancel {
-    background: #dc2626;
-    
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+
     &:hover {
-      background: #b91c1c;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
     }
   }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+`
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 60px 20px;
+  color: #a0aec0;
+`
+
+const EmptyIcon = styled.div`
+  font-size: 48px;
+  margin-bottom: 16px;
 `
 
 const Modal = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(10px);
 `
 
 const ModalContent = styled.div`
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 32px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px);
 `
 
-const ModalTitle = styled.h3`
-  color: #333333;
-  font-size: 18px;
+const ModalTitle = styled.h2`
+  color: white;
+  font-size: 24px;
   font-weight: 600;
-  margin: 0 0 20px 0;
+  margin: 0 0 24px 0;
   text-align: center;
 `
 
@@ -259,51 +450,80 @@ const Form = styled.form`
 `
 
 const Input = styled.input`
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
   padding: 12px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  color: white;
   font-size: 14px;
-  transition: border-color 0.2s ease;
+  outline: none;
+
+  &::placeholder {
+    color: #a0aec0;
+  }
 
   &:focus {
-    outline: none;
-    border-color: #374151;
-    box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1);
+    border-color: #667eea;
   }
 `
 
 const ButtonGroup = styled.div`
   display: flex;
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 8px;
+`
+
+const Button = styled.button`
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+
+  &.primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+  }
+
+  &.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
 `
 
 const CancelButton = styled(Button)`
-  background: #6c757d;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 
   &:hover {
-    background: #5a6268;
+    background: rgba(239, 68, 68, 0.2);
   }
 `
 
 const LoadingImage = styled.img`
-position: absolute;
-left: 60px;
-  width: 50px;
-  height: 50px;
-  box-sizing: border-box;
-`
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 40px 20px;
-  color: #6b7280;
-`
-
-const EmptyIcon = styled.div`
-  font-size: 48px;
-  margin-bottom: 16px;
-  opacity: 0.5;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
 `
 
 const Mypage = () => {
@@ -325,7 +545,7 @@ const Mypage = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["mypage"],
     queryFn: async () => {
-      const data = await getUserInfoCreate(userId)
+      const data = await getUserInfoOne(userId)
       const { data: sellnft } = await axios.get(`${BaseUrl}/sellnft`)
       const parsedSellnft = sellnft.message.map((el) => {
         const parsed = JSON.parse(el.nftUridata)
@@ -343,17 +563,18 @@ const Mypage = () => {
 
   useEffect(() => {
     const { TokenContract } = Contracts
-      ; (async () => {
-        const balance = await TokenContract.balanceOf(userinfo.smartAcc)
-        const newBalance = Math.floor(Number(ethers.formatEther(balance)))
-        setBalance(newBalance)
-        const { data } = await axios.get(`${BaseUrl}/user/${userId}`)
-        const parsedData = data.message.map((el, i) => {
-          const newNftUridata = JSON.parse(el.nftUridata)
-          return { ...el, nftUridata: newNftUridata }
-        })
-        setUserNfts(parsedData)
-      })()
+    if (!Contracts || !userinfo?.smartAcc) return
+    (async () => {
+      const balance = await TokenContract.balanceOf(userinfo.smartAcc)
+      const newBalance = Math.floor(Number(ethers.formatEther(balance)))
+      setBalance(newBalance)
+      const { data } = await axios.get(`${BaseUrl}/user/${userId}`)
+      const parsedData = data.message.map((el, i) => {
+        const newNftUridata = JSON.parse(el.nftUridata)
+        return { ...el, nftUridata: newNftUridata }
+      })
+      setUserNfts(parsedData)
+    })()
   }, [Contracts, sellLists])
 
   const sellNft = async (e) => {
@@ -411,168 +632,221 @@ const Mypage = () => {
 
   return (
     <Container>
-      <Header>
-        <HeaderContent>
-          <Link to='/main'><Logo>ZunoNFT Platform</Logo></Link>
-          <Navigation>
-            <NavLink to="/main">메인페이지</NavLink>
-            <LogoutButton onClick={LogoutHandler}>로그아웃</LogoutButton>
-          </Navigation>
-        </HeaderContent>
-      </Header>
+      <Sidebar>
+        <Logo>ZunoNFT</Logo>
+        <NavMenu>
+          <NavItem onClick={() => navigate('/main')}>
+            📊 Dashboard
+          </NavItem>
+          <NavItem onClick={() => navigate('/main#marketplace')}>
+            🛍️ Marketplace
+          </NavItem>
+          <NavItem onClick={() => navigate('/bids')}>
+            🔨 Active Bids
+          </NavItem>
+          <NavItem onClick={() => navigate('/favorites')}>
+            ❤️ Favourites
+          </NavItem>
+          <NavItem onClick={() => navigate('/collections')}>
+            📁 Collections
+          </NavItem>
+          <NavItem onClick={() => navigate('/launchpad')}>
+            🚀 Launchpad
+          </NavItem>
+          <NavItem onClick={() => navigate('/mypage')} style={{ background: 'rgba(102, 126, 234, 0.2)' }}>
+            💼 Portfolio
+          </NavItem>
+          <NavItem onClick={() => navigate('/history')}>
+            📄 Trade History
+          </NavItem>
+          <NavItem onClick={() => navigate('/settings')}>
+            ⚙️ Settings
+          </NavItem>
+        </NavMenu>
+        <LogoutButton onClick={LogoutHandler}>
+          🚪 Log Out
+        </LogoutButton>
+      </Sidebar>
 
-      <Content>
-        {isactive && (
-          <Modal onClick={(e) => e.target === e.currentTarget && setIsactive(false)}>
-            <ModalContent>
-              <ModalTitle>NFT 판매</ModalTitle>
-              <Form onSubmit={(e) => sellNft(e)}>
-                <Input type="number" name="NfttknAmt" placeholder="판매할 수량을 입력하세요" />
-                <Input type="number" name="uintprice" placeholder="개당 판매 가격 (BTK)" />
-                <ButtonGroup>
-                  <CancelButton type="button" onClick={() => setIsactive(false)}>
-                    취소
-                  </CancelButton>
-                  <Button type="submit">판매 등록</Button>
-                </ButtonGroup>
-              </Form>
-            </ModalContent>
-          </Modal>
-        )}
-        <h2>메인 페이지</h2>
-        <Card>
-          <SectionTitle>사용자 정보</SectionTitle>
-          <UserInfoGrid>
-            <InfoItem>
-              <InfoLabel>아이디</InfoLabel>
-              <InfoValue>{userId}</InfoValue>
-            </InfoItem>
-            <InfoItem>
-              <InfoLabel>Public Key</InfoLabel>
-              <InfoValue>{userinfo.UserAddress}</InfoValue>
-            </InfoItem>
-            <InfoItem>
-              <InfoLabel>Smart Account</InfoLabel>
-              <InfoValue>{userinfo.smartAcc}</InfoValue>
-            </InfoItem>
-            <InfoItem>
-              <InfoLabel>잔액</InfoLabel>
-              <InfoValue>{balance ? balance : 0} BTK</InfoValue>
-            </InfoItem>
-            <InfoItem>
-              <InfoLabel>화이트리스트</InfoLabel>
-              <InfoValue>{userinfo.checkWhitelist === true ? "true" : "false"}</InfoValue>
-            </InfoItem>
-          </UserInfoGrid>
-        </Card>
+      <MainContent>
+        <Header>
+          <HeaderLeft>
+            {/* Additional header content can go here */}
+          </HeaderLeft>
+          <HeaderCenter>
+            <SearchBar>
+              <input type="text" placeholder="Search portfolio..." />
+            </SearchBar>
+          </HeaderCenter>
+          <HeaderRight>
+            <Balance>
+              💰 {balance ? balance : 0} BTK
+            </Balance>
+            <UserProfile onClick={() => navigate('/mypage')}>
+              <Avatar>{userId?.charAt(0)?.toUpperCase() || 'U'}</Avatar>
+              <span>{userId || 'User'}</span>
+            </UserProfile>
+          </HeaderRight>
+        </Header>
 
-        <Card>
-          <SectionTitle>내 NFT 컬렉션</SectionTitle>
-          {!userNfts || userNfts.length === 0 ? (
-            <EmptyState>
-              <EmptyIcon>🖼️</EmptyIcon>
-              <h3>보유한 NFT가 없습니다</h3>
-              <p>메인페이지에서 NFT를 생성하거나 구매해보세요</p>
-            </EmptyState>
-          ) : (
-            <NFTGrid>
-              {userNfts?.map((el, i) => {
-                return (
-                  <NFTCard key={i}>
-                    <NFTImage src={el.nftUridata.image} alt={el.nftUridata.name} />
-                    <NFTContent>
-                      <NFTTitle><span>이름 : {el.nftUridata.name}</span></NFTTitle>
-                      <NFTInfo>
-                        <span>토큰 ID: {el.nftid}</span>
-                        <span>보유량: {el.nftidToken}</span>
-                      </NFTInfo>
-                      <NFTDescription>{el.nftUridata.description}</NFTDescription>
-                      {loading ? (
-                        <Button disabled>
-                          <LoadingImage src={loadingGif} />
-                          처리 중...
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => {
-                            setIsactive(true)
-                            const stringifyNftUridata = JSON.stringify(el.nftUridata)
-                            setSelldata((prev) => ({
-                              ...prev,
-                              userid: el.userid,
-                              nftid: el.nftid,
-                              nftUridata: stringifyNftUridata,
-                            }))
-                          }}
-                        >
-                          판매하기
-                        </Button>
-                      )}
-                    </NFTContent>
-                  </NFTCard>
-                )
-              })}
-            </NFTGrid>
+        <Content>
+          <PageTitle>Portfolio</PageTitle>
+          <PageSubtitle>
+            Manage your NFTs, view your collection, and track your trading activities
+          </PageSubtitle>
+
+          {isactive && (
+            <Modal onClick={(e) => e.target === e.currentTarget && setIsactive(false)}>
+              <ModalContent>
+                <ModalTitle>NFT 판매</ModalTitle>
+                <Form onSubmit={(e) => sellNft(e)}>
+                  <Input type="number" name="NfttknAmt" placeholder="판매할 수량을 입력하세요" />
+                  <Input type="number" name="uintprice" placeholder="개당 판매 가격 (BTK)" />
+                  <ButtonGroup>
+                    <CancelButton type="button" onClick={() => setIsactive(false)}>
+                      취소
+                    </CancelButton>
+                    <Button type="submit" className="primary">판매 등록</Button>
+                  </ButtonGroup>
+                </Form>
+              </ModalContent>
+            </Modal>
           )}
-        </Card>
 
-        <Card>
-          <SectionTitle>판매 중인 NFT</SectionTitle>
-          {!sellLists || sellLists.filter((el) => el.userid === userId).length === 0 ? (
-            <EmptyState>
-              <EmptyIcon>🏪</EmptyIcon>
-              <h3>판매 중인 NFT가 없습니다</h3>
-              <p>보유한 NFT를 판매해보세요</p>
-            </EmptyState>
-          ) : (
-            <NFTGrid>
-              {sellLists.map((el, i) => {
-                if (el.userid === userId) {
+          <Card>
+            <SectionTitle>사용자 정보</SectionTitle>
+            <UserInfoGrid>
+              <InfoItem>
+                <InfoLabel>아이디</InfoLabel>
+                <InfoValue>{userId}</InfoValue>
+              </InfoItem>
+              <InfoItem>
+                <InfoLabel>Public Key</InfoLabel>
+                <InfoValue>{userinfo.UserAddress}</InfoValue>
+              </InfoItem>
+              <InfoItem>
+                <InfoLabel>Smart Account</InfoLabel>
+                <InfoValue>{userinfo?.smartAcc}</InfoValue>
+              </InfoItem>
+              <InfoItem>
+                <InfoLabel>잔액</InfoLabel>
+                <InfoValue>{balance ? balance : 0} BTK</InfoValue>
+              </InfoItem>
+              <InfoItem>
+                <InfoLabel>화이트리스트</InfoLabel>
+                <InfoValue>{userinfo.checkWhitelist === true ? "true" : "false"}</InfoValue>
+              </InfoItem>
+            </UserInfoGrid>
+          </Card>
+
+          <Card>
+            <SectionTitle>내 NFT 컬렉션</SectionTitle>
+            {!userNfts || userNfts.length === 0 ? (
+              <EmptyState>
+                <EmptyIcon>🖼️</EmptyIcon>
+                <h3>보유한 NFT가 없습니다</h3>
+                <p>메인페이지에서 NFT를 생성하거나 구매해보세요</p>
+              </EmptyState>
+            ) : (
+              <NFTGrid>
+                {userNfts?.map((el, i) => {
                   return (
                     <NFTCard key={i}>
                       <NFTImage src={el.nftUridata.image} alt={el.nftUridata.name} />
                       <NFTContent>
+                        <NFTTitle><span>이름 : {el.nftUridata.name}</span></NFTTitle>
                         <NFTInfo>
-                          <NFTTitle>이름 : {el.nftUridata.name}</NFTTitle>
                           <span>토큰 ID: {el.nftid}</span>
-                        </NFTInfo>
-                        <NFTInfo>
-                          <NFTPrice>가격 : {el.price} BTK</NFTPrice>
-                          <span>판매량: {el.nftidTokenAmt}</span>
+                          <span>보유량: {el.nftidToken}</span>
                         </NFTInfo>
                         <NFTDescription>{el.nftUridata.description}</NFTDescription>
                         {loading ? (
-                          <Button disabled>
+                          <ActionButton disabled>
                             <LoadingImage src={loadingGif} />
                             처리 중...
-                          </Button>
+                          </ActionButton>
                         ) : (
-                          <Button
-                            className="cancel"
+                          <ActionButton
+                            className="sell"
                             onClick={() => {
-                              MypageCancelHandler({
+                              setSelldata((prev) => ({
+                                ...prev,
                                 userid: el.userid,
-                                sender: el.smartAccAddress,
                                 nftid: el.nftid,
-                                nftUridata: el.nftUridata,
-                                nftidToken: el.nftidTokenAmt,
-                              })
-                              return
+                                nftUridata: JSON.stringify(el.nftUridata),
+                              }))
+                              setIsactive(true)
                             }}
                           >
-                            판매 취소
-                          </Button>
+                            판매하기
+                          </ActionButton>
                         )}
                       </NFTContent>
                     </NFTCard>
                   )
-                }
-                return null
-              })}
-            </NFTGrid>
-          )}
-        </Card>
-      </Content>
+                })}
+              </NFTGrid>
+            )}
+          </Card>
+
+          <Card>
+            <SectionTitle>판매 중인 NFT</SectionTitle>
+            {!sellLists || sellLists.filter((el) => el.userid === userId).length === 0 ? (
+              <EmptyState>
+                <EmptyIcon>🏪</EmptyIcon>
+                <h3>판매 중인 NFT가 없습니다</h3>
+                <p>보유한 NFT를 판매해보세요</p>
+              </EmptyState>
+            ) : (
+              <NFTGrid>
+                {sellLists.map((el, i) => {
+                  if (el.userid === userId) {
+                    return (
+                      <NFTCard key={i}>
+                        <NFTImage src={el.nftUridata.image} alt={el.nftUridata.name} />
+                        <NFTContent>
+                          <NFTInfo>
+                            <NFTTitle>이름 : {el.nftUridata.name}</NFTTitle>
+                            <span>토큰 ID: {el.nftid}</span>
+                          </NFTInfo>
+                          <NFTInfo>
+                            <span>가격 : {el.price} BTK</span>
+                            <span>판매량: {el.nftidTokenAmt}</span>
+                          </NFTInfo>
+                          <NFTDescription>{el.nftUridata.description}</NFTDescription>
+                          {loading ? (
+                            <Button disabled>
+                              <LoadingImage src={loadingGif} />
+                              처리 중...
+                            </Button>
+                          ) : (
+                            <ActionButton
+                              className="cancel"
+                              onClick={() => {
+                                MypageCancelHandler({
+                                  userid: el.userid,
+                                  sender: el.smartAccAddress,
+                                  nftid: el.nftid,
+                                  nftUridata: el.nftUridata,
+                                  nftidToken: el.nftidTokenAmt,
+                                })
+                                return
+                              }}
+                            >
+                              판매 취소
+                            </ActionButton>
+                          )}
+                        </NFTContent>
+                      </NFTCard>
+                    )
+                  }
+                  return null
+                })}
+              </NFTGrid>
+            )}
+          </Card>
+        </Content>
+      </MainContent>
     </Container>
   )
 }
