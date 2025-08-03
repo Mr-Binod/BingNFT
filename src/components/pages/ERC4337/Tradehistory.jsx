@@ -902,7 +902,6 @@ const Tradehistory = () => {
           const allEventData = []
           for (const event of allEvents) {
             const { from, to, id, amount, price, trade, uri } = event.args
-            console.log('Raw trade value from blockchain:', trade)
             const uridata = await axios.get(`https://gateway.pinata.cloud/ipfs/${uri}`, {
               timeout: 1000 // 5 second timeout
             });
@@ -918,8 +917,6 @@ const Tradehistory = () => {
 
           // Filter all events based on activeFilter, timeFilter, and debouncedSearchQuery
           const filteredEvents = allEventData.filter(trade => {
-            console.log('Trade data:', trade.trade, 'Filter:', activeFilter, 'TimeFilter:', timeFilter, 'Search:', debouncedSearchQuery)
-
             // First filter by trade type
             let passesTradeFilter = false
             if (activeFilter === 'all') passesTradeFilter = true
@@ -935,15 +932,11 @@ const Tradehistory = () => {
             const tradeTime = trade.timestamp
             const timeDiff = now - tradeTime
 
-            console.log(`Trade time: ${new Date(tradeTime * 1000).toLocaleString()}, Time diff: ${timeDiff} seconds, Filter: ${timeFilter}`)
-
             let passesTimeFilter = false
             if (timeFilter === 'all') passesTimeFilter = true
             else if (timeFilter === '24h') passesTimeFilter = timeDiff <= 24 * 60 * 60
             else if (timeFilter === '7d') passesTimeFilter = timeDiff <= 7 * 24 * 60 * 60
             else if (timeFilter === '30d') passesTimeFilter = timeDiff <= 30 * 24 * 60 * 60
-
-            console.log(`Time filter result: ${passesTimeFilter}`)
 
             if (!passesTimeFilter) return false
 
@@ -955,19 +948,12 @@ const Tradehistory = () => {
             const nameLower = nftName.toLowerCase()
 
             const passesSearchFilter = nameLower.includes(searchLower)
-            console.log(`Search filter: "${nftName}" includes "${debouncedSearchQuery}" = ${passesSearchFilter}`)
 
             return passesSearchFilter
           })
 
           // Sort filtered events by timestamp in descending order (latest first)
           const sortedEvents = filteredEvents.sort((a, b) => b.timestamp - a.timestamp)
-
-          console.log(`Sorted ${sortedEvents.length} events by timestamp (latest first)`)
-          if (sortedEvents.length > 0) {
-            console.log(`Latest event: ${new Date(sortedEvents[0].timestamp * 1000).toLocaleString()}`)
-            console.log(`Oldest event: ${new Date(sortedEvents[sortedEvents.length - 1].timestamp * 1000).toLocaleString()}`)
-          }
 
           // Paginate the sorted results
           const startIndex = (currentPage - 1) * eventsPerPage
@@ -1021,13 +1007,11 @@ const Tradehistory = () => {
 
 
   useEffect(() => {
-    console.log('Active filter changed to:', activeFilter)
     // Reset to page 1 when filter changes
     setCurrentPage(1)
   }, [activeFilter])
 
   useEffect(() => {
-    console.log('Time filter changed to:', timeFilter)
     // Reset to page 1 when time filter changes
     setCurrentPage(1)
   }, [timeFilter, debouncedSearchQuery])

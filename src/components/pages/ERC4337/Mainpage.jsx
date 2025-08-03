@@ -24,7 +24,6 @@ const retryWithBackoff = async (fn, maxRetries = 3, baseDelay = 1000) => {
     } catch (error) {
       if (error.message.includes('429') || error.message.includes('Too Many Requests')) {
         const delayMs = baseDelay * Math.pow(2, i)
-        console.log(`Rate limited, retrying in ${delayMs}ms...`)
         await delay(delayMs)
         continue
       }
@@ -1497,7 +1496,7 @@ const Mainpage = () => {
         const data = await getUserInfoOne(userId)
         setUserInfo(data.message)
         dispatch({ type: "setUser", payload: data.message })
-        console.log(data, 'mainpage user query')
+  
         return data
       })
       return data
@@ -1537,7 +1536,7 @@ const Mainpage = () => {
       const File = e.target.file.files[0]
       dispatch({ type: "Loading", payload: true })
 
-      console.log(nftname.value, nftdesc.value, File)
+
       if (!nftname.value.trim() || !nftdesc.value.trim() || !File) {
         dispatch({ type: "Loading", payload: false })
         return alert("모든 필드를 채워주세요.");
@@ -1546,16 +1545,16 @@ const Mainpage = () => {
       const nftDesc = nftdesc.value
 
       formdata.append("file", File)
-      console.log(formdata)
+
 
       const IpfsUri = await uploadIPFS({ formdata, nftName, nftDesc })
       const data = await CreateNft(IpfsUri, smartAcc)
 
-      console.log(data, "data")
+
       const filter = await NftContract.filters.TokenURICreated() // create a filter
       const events = await NftContract.queryFilter(filter, 0, "latest") // from block 0 to latest
       const latestEvent = await NftContract.queryFilter(filter, "latest", "latest") // from block 0 to latest
-      console.log(latestEvent, "Lastest")
+
       for (const event of events) {
         const { tokenId, sender, uri } = event.args
         try {
@@ -1569,7 +1568,7 @@ const Mainpage = () => {
       }
       for (const event of latestEvent) {
         const { tokenId, sender, uri } = event.args
-        console.log(sender, userInfo.smartAcc, "ss")
+
         if (sender !== userInfo.smartAcc) return alert("ff")
         const nftidToken = Number(await NftContract.balanceOf(sender, tokenId))
         try {
@@ -1579,16 +1578,16 @@ const Mainpage = () => {
           const newtokenId = Number(tokenId)
           const JsonData = JSON.stringify(uridata.data)
           const _data = { userid: userId, nftid: newtokenId, nftidToken, nftUridata: JsonData }
-          console.log(_data)
+
           const data = await axios.post(`${BaseUrl}/createusernft`, _data)
-          console.log(data, 'dd')
+
         } catch (error) {
           alert("NFT 추가 오류" + error)
         }
       }
       alert("nft 추가 완료")
       dispatch({ type: "Loading", payload: false })
-      console.log('GG', data, Eventlog)
+
       // navigate('/mypage')
       return Eventlog
 
@@ -1641,7 +1640,7 @@ const Mainpage = () => {
           setUserBalance(newBalance)
           dispatch({ type: "Loading", payload: false })
           await queryClient.invalidateQueries({ queryKey: ["user"] })
-          console.log(address, amount)
+
         } catch (error) {
           console.error('Error in minted event handler:', error)
           dispatch({ type: "Loading", payload: false })
@@ -1688,7 +1687,7 @@ const Mainpage = () => {
     const _data = { smartAccAddress: sender, nftid }
     const stringifyData = JSON.stringify(nftUridata)
     const updataData = { userid, nftid, nftUridata: stringifyData, nftidToken }
-    console.log(_data)
+
     const confirmed = window.confirm("판매 취소 하시겠습니까?")
     if (!confirmed) return
     dispatch({ type: "Loading", payload: true })
@@ -1715,17 +1714,17 @@ const Mainpage = () => {
       dispatch({ type: "Loading", payload: true })
       const result = await axios.post(`${BaseUrl}/buynft`, data)
 
-      // console.log(result, "buynft")
+      
       const { data: Deletedata } = await axios.delete(`${BaseUrl}/sellnft`, { data: _data })
       const result2 = await axios.post(`${BaseUrl}/contractbuynft`, data)
 
       const amount = ethers.parseEther(`${price}`, 18)
-      // console.log({ sender, nftid, nftUridata, nftidToken, price, amount })
+      
 
       const mintCallData = TokenContract.interface.encodeFunctionData("transfer(address,uint256)", [sender, amount])
       // const events = await EntryPointContract.on("UserOpCompleted")
 
-      // console.log("nonce", events)
+      
       const callData = SmartAccountContract.interface.encodeFunctionData("execute", [
         process.env.REACT_APP_BING_TKN_CA,
         value,
@@ -1785,8 +1784,6 @@ const Mainpage = () => {
     const matchesName = nameLower.includes(searchLower)
     const matchesDesc = descLower.includes(searchLower)
     const matchesSeller = sellerLower.includes(searchLower)
-
-    console.log(`Search: "${debouncedSearchQuery}" | NFT: "${nftName}" | Matches: ${matchesName || matchesDesc || matchesSeller}`)
 
     return matchesName || matchesDesc || matchesSeller
   }) || [];

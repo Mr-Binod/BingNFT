@@ -629,7 +629,7 @@ const Newpage = () => {
       }
       dispatch({ type: "Loading", payload: true })
       const response = await CreateAcc(data)
-      // console.log(response)
+      
       if (response.state === 200) {
         alert("가입 완료되었습니다")
         // Switch to login mode after successful signup
@@ -652,9 +652,9 @@ const Newpage = () => {
     e.preventDefault()
 
     const { userid, userpw } = e.target
-    // console.log("gg", userid.value, userpw.value)
+    
     const data = await getUserInfo(userid.value, userpw.value)
-    // console.log(data, "f")
+    
     if (!data) return
     dispatch({ type: "setUserId", payload: userid.value }) // ✅ Set in Redux
     dispatch({ type: "login" })
@@ -663,7 +663,7 @@ const Newpage = () => {
     navigate("/main")
   }
 
-  // console.log(loading)
+  
 
   return (
     <Container>

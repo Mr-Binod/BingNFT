@@ -831,7 +831,7 @@ const Mypage = () => {
           setUserNfts([]);
         }
       } else {
-        console.log('Invalid smart account address or contracts not ready:', userinfo?.smartAcc);
+
         // Set default values when address is invalid
         setBalance(0);
         setUserNfts([]);
