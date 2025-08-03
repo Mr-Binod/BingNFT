@@ -5,7 +5,6 @@ import { useState } from "react"
 import { CreateAcc, getUserInfo } from "../../../api/ERC4337/NewApi"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import loadingGif from "../../../images"
 import styled, { keyframes } from "styled-components"
 
 // Animations
@@ -744,7 +743,6 @@ const Newpage = () => {
               {loading ? (
                 <SignupButtonWrapper>
                   <Button disabled>
-                    <LoadingImage src={loadingGif} />
                     계정 생성 중...
                   </Button>
                 </SignupButtonWrapper>
@@ -773,7 +771,6 @@ const Newpage = () => {
               </OptionsRow>
               {loading ? (
                                   <Button disabled>
-                    <LoadingImage src={loadingGif} />
                     로그인 중...
                   </Button>
               ) : (

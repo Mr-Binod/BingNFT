@@ -1,3 +1,4 @@
 import loadingGif from './loaad.gif'
+import github from './github.png'
 
-export default loadingGif
+export { loadingGif, github }

@@ -59,15 +59,9 @@ const Sidebar = styled.div`
   flex-direction: column;
   gap: 32px;
   box-sizing: border-box;
-  
+
   @media (max-width: 768px) {
-    width: 100%;
-    height: auto;
-    position: relative;
-    padding: 16px;
-    gap: 16px;
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: none;
   }
 `
 
@@ -93,10 +87,18 @@ const NavMenu = styled.nav`
   gap: 8px;
   
   @media (max-width: 768px) {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
+    flex: 1;
+  display: flex;
+  flex-direction: column;
+  
+  gap: 8px;
+  }
+  @media (max-width: 480px) {
+    flex: 1;
+  display: flex;
+  flex-direction: column;
+  
+  gap: 8px;
   }
 `
 
@@ -107,6 +109,16 @@ const NavItem = styled.div`
   transition: all 0.3s ease;
   font-weight: 500;
   display: flex;
+  align-items: center;
+  gap: 12px;
+  background: ${props => props.className === 'active' ? 'rgba(102, 126, 234, 0.2)' : 'transparent'};
+  border: 1px solid ${props => props.className === 'active' ? 'rgba(102, 126, 234, 0.3)' : 'rgba(255, 255, 255, 0.1)'};
+  color: ${props => props.className === 'active' ? 'white' : '#a0aec0'};
+
+  &:hover {
+    background: ${props => props.className === 'active' ? 'rgba(102, 126, 234, 0.3)' : 'rgba(255, 255, 255, 0.1)'};
+    transform: translateX(4px);
+  }
   
   @media (max-width: 768px) {
     padding: 12px 16px;
@@ -116,18 +128,10 @@ const NavItem = styled.div`
   }
   
   @media (max-width: 480px) {
-    padding: 10px 12px;
+    padding: 0px 12px;
+    height: 40px;
     font-size: 12px;
     min-width: 100px;
-  }
-  align-items: center;
-  gap: 12px;
-  background: rgba(102, 126, 234, 0.1);
-  border: 1px solid rgba(102, 126, 234, 0.2);
-
-  &:hover {
-    background: rgba(102, 126, 234, 0.2);
-    transform: translateX(4px);
   }
 `
 
@@ -151,84 +155,177 @@ const LogoutButton = styled.button`
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
   }
+  
+  @media (max-width: 768px) {
+    margin-top: auto;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  @media (max-width: 480px) {
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    font-size: 12px;
+  }
 `
 
 const MainContent = styled.div`
   flex: 1;
   margin-left: 280px;
   padding: 32px 138px;
+  padding-top: 140px;
   overflow-y: auto;
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+    padding: 16px;
+    padding-top: 140px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
+    padding-top: 140px;
+  }
+`
+const Header = styled.header`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 138px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: fixed;
+  top: 0;
+  left: 280px;
+  right: 0;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 70%, #1a1a2e 100%);
+  backdrop-filter: blur(20px);
+  z-index: 100;
+ 
+  
+  @media (max-width: 768px) {
+    gap: 12px;
+    padding: 16px;
+    left: 0;
+    right: 0;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 8px;
+    padding: 12px 16px;
+  }
 `
 
-const Header = styled.div`
+const HeaderTop = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
-  padding: 24px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  justify-content: space-between;
+  width: 100%;
+`
+
+const HeaderBottom = styled.div`
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  
+  @media (max-width: 768px) {
+    display: flex;
+  }
 `
 
 const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
+  min-width: 200px;
+`
+
+const DesktopLogo = styled.div`
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
 `
 
 const HeaderCenter = styled.div`
-  flex: 1;
   display: flex;
+  align-items: center;
   justify-content: center;
+  flex: 1;
+  max-width: 500px;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
 `
 
 const HeaderRight = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+  min-width: 200px;
+  justify-content: flex-end;
+  /* padding-right: 16px; */
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: flex-end;
+  }
 `
 
 const SearchBar = styled.div`
-  position: relative;
-  width: 400px;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  width: 300px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 
   input {
-    width: 100%;
-    padding: 16px 20px;
-    padding-left: 48px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
+    background: none;
+    border: none;
     color: white;
-    font-size: 16px;
     outline: none;
-    transition: all 0.3s ease;
+    width: 100%;
+    font-size: 14px;
 
     &::placeholder {
       color: #a0aec0;
     }
-
-    &:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    }
   }
-
-  &::before {
-    content: '🔍';
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px 12px;
+    
+    input {
+      font-size: 13px;
+    }
   }
 `
 
 const Balance = styled.div`
-  background: rgba(255, 255, 255, 0.05);
-  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
   border-radius: 12px;
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  font-weight: 600;
   
   @media (max-width: 768px) {
     display: none;
@@ -251,19 +348,26 @@ const MobileBalance = styled.div`
   }
 `
 
+
 const UserProfile = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
   border-radius: 12px;
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+    font-size: 14px;
   }
 `
 
@@ -277,6 +381,12 @@ const Avatar = styled.div`
   justify-content: center;
   font-weight: 600;
   font-size: 14px;
+  
+  @media (max-width: 768px) {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
 `
 
 const Content = styled.div`
@@ -306,8 +416,9 @@ const PageSubtitle = styled.p`
 
 const FilterBar = styled.div`
   display: flex;
+  /* flex-direction: column; */
   justify-content: space-between;
-  align-items: center;
+  gap: 16px;
   margin-bottom: 32px;
   padding: 24px;
   background: rgba(255, 255, 255, 0.05);
@@ -315,11 +426,33 @@ const FilterBar = styled.div`
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   animation: ${fadeInUp} 0.8s ease-out 0.4s both;
+  
+  @media (min-width: 769px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
 `
+
+const FilterSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 590px;
+  
+  
+  @media (min-width: 769px) {
+    flex-direction: row;
+    align-items: center;
+  }`
 
 const FilterButtons = styled.div`
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+  
+  @media (max-width: 768px) {
+    gap: 6px;
+  }
 `
 
 const FilterButton = styled.button`
@@ -336,11 +469,23 @@ const FilterButton = styled.button`
   &:hover {
     background: ${props => props.active ? 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)' : 'rgba(255, 255, 255, 0.1)'};
   }
+  
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+    font-size: 12px;
+    flex: 1;
+    min-width: fit-content;
+  }
 `
 
 const TimeFilter = styled.div`
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
+  
+  @media (max-width: 768px) {
+    gap: 4px;
+  }
 `
 
 const TradeHistoryTable = styled.div`
@@ -354,7 +499,7 @@ const TradeHistoryTable = styled.div`
 
 const TableHeader = styled.div`
   display: grid;
-  grid-template-columns: 60px 1fr 1fr 1fr 1fr 120px;
+  grid-template-columns: 50px 2fr 1fr 1fr 1fr 70px;
   gap: 24px;
   padding: 24px;
   background: rgba(255, 255, 255, 0.05);
@@ -362,11 +507,28 @@ const TableHeader = styled.div`
   font-weight: 600;
   color: #a0aec0;
   font-size: 14px;
+  
+  > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  > div:nth-child(2) {
+    justify-content: flex-start;
+  }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 35px 2.5fr 1fr 0.8fr 0.8fr 60px;
+    gap: 6px;
+    padding: 12px 8px;
+    font-size: 11px;
+  }
 `
 
 const TableRow = styled.div`
   display: grid;
-  grid-template-columns: 60px 1fr 1fr 1fr 1fr 120px;
+  grid-template-columns: 50px 2fr 1fr 1fr 1fr 70px;
   gap: 24px;
   padding: 20px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -380,12 +542,22 @@ const TableRow = styled.div`
   &:last-child {
     border-bottom: none;
   }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 35px 2.5fr 1fr 0.8fr 0.8fr 60px;
+    gap: 6px;
+    padding: 12px 8px;
+    font-size: 12px;
+  }
 `
 
 const RankNumber = styled.div`
   font-weight: 700;
   color: ${props => props.rank <= 3 ? '#f59e0b' : '#a0aec0'};
   font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 const NFTInfo = styled.div`
@@ -448,42 +620,51 @@ const Price = styled.div`
   font-weight: 600;
   color: #10b981;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 const Volume = styled.div`
   font-weight: 600;
   color: #667eea;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 const Change = styled.div`
   font-weight: 600;
   color: ${props => props.positive ? '#10b981' : '#ef4444'};
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 const Status = styled.div`
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   text-align: center;
-  background: ${props => {
-    switch (props.status) {
-      case 'completed': return 'rgba(16, 185, 129, 0.2)';
-      case 'pending': return 'rgba(245, 158, 11, 0.2)';
-      case 'failed': return 'rgba(239, 68, 68, 0.2)';
-      default: return 'rgba(160, 174, 192, 0.2)';
-    }
-  }};
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: ${props => {
     switch (props.status) {
-      case 'completed': return '#10b981';
-      case 'pending': return '#f59e0b';
-      case 'failed': return '#ef4444';
+      case 'buy': return '#10b981';
+      case 'sell': return '#f59e0b';
+      case 'cancel': return '#ef4444';
+      case 'mint': return '#667eea';
       default: return '#a0aec0';
     }
   }};
+  
+  @media (max-width: 768px) {
+    font-size: 12px;
+    font-weight: 500;
+  }
 `
 
 const EmptyState = styled.div`
@@ -555,14 +736,58 @@ const MobileMenuButton = styled.button`
   font-size: 24px;
   cursor: pointer;
   padding: 8px;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
   
   @media (max-width: 768px) {
     display: block;
   }
 `
 
+const slideInTrade = keyframes`
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+`
+
+const slideOutTrade = keyframes`
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+`
+
+const fadeInTrade = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`
+
+const fadeOutTrade = keyframes`
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+`
+
 const MobileOverlay = styled.div`
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -570,30 +795,59 @@ const MobileOverlay = styled.div`
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
   
   @media (max-width: 768px) {
-    display: ${props => props.showMobileMenu ? 'block' : 'none'};
+    opacity: ${props => props.showMobileMenu ? 1 : 0};
+    visibility: ${props => props.showMobileMenu ? 'visible' : 'hidden'};
+  }
+  
+  @media (min-width: 769px) {
+    display: none;
   }
 `
 
 const MobileSidebar = styled.div`
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
   width: 280px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(26, 32, 44, 0.95);
   backdrop-filter: blur(20px);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   padding: 32px 24px;
   z-index: 1001;
-  animation: slideIn 0.3s ease-out;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 15px 15px 0;
+  box-sizing: border-box;
   
   @media (max-width: 768px) {
-    display: ${props => props.showMobileMenu ? 'flex' : 'none'};
-    flex-direction: column;
+    top: 65px;
+    height: calc(100vh - 80px);
     gap: 32px;
+    width: 50%;
+    padding: 24px;
+    transform: ${props => props.showMobileMenu ? 'translateX(0)' : 'translateX(-100%)'};
+  }
+  
+  @media (min-width: 769px) {
+    display: none;
+  }
+  @media (max-width: 480px) {
+    top: 65px;
+    height: calc(100vh - 80px);
+    padding: 16px;
+    gap: 16px;
+    border-radius: 0 15px 15px 0;
+    box-sizing: border-box;
+    transform: ${props => props.showMobileMenu ? 'translateX(0)' : 'translateX(-100%)'};
+    animation: ${props => props.showMobileMenu ? slideInTrade : slideOutTrade} 0.3s ease-out;
   }
 `
 
@@ -800,12 +1054,10 @@ const Tradehistory = () => {
           <NavItem onClick={() => navigate('/mypage')}>
             💼 포트폴리오
           </NavItem>
-          <NavItem onClick={() => navigate('/history')} style={{ background: 'rgba(102, 126, 234, 0.2)' }}>
+          <NavItem onClick={() => navigate('/history')} className="active">
             📄 거래 내역
           </NavItem>
-          <NavItem onClick={() => navigate('/settings')}>
-            ⚙️ 설정
-          </NavItem>
+      
         </NavMenu>
         <LogoutButton onClick={LogoutHandler}>
           🚪 로그아웃
@@ -826,12 +1078,10 @@ const Tradehistory = () => {
           <NavItem onClick={() => navigate('/mypage')}>
             💼 포트폴리오
           </NavItem>
-          <NavItem onClick={() => navigate('/history')} style={{ background: 'rgba(102, 126, 234, 0.2)' }}>
+          <NavItem onClick={() => navigate('/history')} className="active">
             📄 거래 내역
           </NavItem>
-          <NavItem onClick={() => navigate('/settings')}>
-            ⚙️ 설정
-          </NavItem>
+     
         </NavMenu>
         <LogoutButton onClick={LogoutHandler}>
           🚪 로그아웃
@@ -839,34 +1089,47 @@ const Tradehistory = () => {
       </MobileSidebar>
 
       <MainContent>
-        <Header>
-          <HeaderLeft>
-            <MobileMenuButton onClick={() => setShowMobileMenu(!showMobileMenu)}>
-              ☰
-            </MobileMenuButton>
-          </HeaderLeft>
-          <HeaderCenter>
+                <Header>
+          <HeaderTop>
+            <HeaderLeft>
+              <MobileMenuButton onClick={() => setShowMobileMenu(!showMobileMenu)}>
+                ☰
+              </MobileMenuButton>
+              <MobileBalance>
+                💰 {balance ? balance : 0} BTK
+              </MobileBalance>
+              {/* <DesktopLogo>ZunoNFT</DesktopLogo> */}
+            </HeaderLeft>
+            <HeaderCenter>
+              <SearchBar>
+                <input
+                  type="text"
+                  placeholder="NFT, 컬렉션, 사용자 검색..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </SearchBar>
+            </HeaderCenter>
+            <HeaderRight>
+              <Balance>
+                💰 {balance ? balance : 0} BTK
+              </Balance>
+              <UserProfile onClick={() => navigate('/mypage')}>
+                <Avatar>{userId?.charAt(0)?.toUpperCase() || 'U'}</Avatar>
+                <span>{userId || '사용자'}</span>
+              </UserProfile>
+            </HeaderRight>
+          </HeaderTop>
+          <HeaderBottom>
             <SearchBar>
               <input
                 type="text"
-                placeholder="NFT 이름 검색..."
+                placeholder="NFT, 컬렉션, 사용자 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </SearchBar>
-            <MobileBalance>
-              💰 {balance}
-            </MobileBalance>
-          </HeaderCenter>
-          <HeaderRight>
-            <Balance>
-              💰 {balance} BTK
-            </Balance>
-            <UserProfile onClick={() => navigate('/mypage')}>
-              <Avatar>{userId?.charAt(0)?.toUpperCase() || 'U'}</Avatar>
-              <span>{userId || '사용자'}</span>
-            </UserProfile>
-          </HeaderRight>
+          </HeaderBottom>
         </Header>
 
         <Content>
@@ -876,36 +1139,37 @@ const Tradehistory = () => {
           </PageSubtitle>
 
           <FilterBar>
+            <FilterSection>
             <FilterButtons>
               <FilterButton
                 active={activeFilter === 'all'}
                 onClick={() => setActiveFilter('all')}
               >
-                모든 거래
+                  모든 거래
               </FilterButton>
               <FilterButton
                 active={activeFilter === 'completed'}
                 onClick={() => setActiveFilter('completed')}
               >
-                완료됨
+                  완료됨
               </FilterButton>
               <FilterButton
                 active={activeFilter === 'pending'}
                 onClick={() => setActiveFilter('pending')}
               >
-                대기중
+                  대기중
               </FilterButton>
               <FilterButton
                 active={activeFilter === 'failed'}
                 onClick={() => setActiveFilter('failed')}
               >
-                실패
+                  실패
               </FilterButton>
               <FilterButton
                 active={activeFilter === 'minted'}
                 onClick={() => setActiveFilter('minted')}
               >
-                민팅됨
+                  민팅됨
               </FilterButton>
             </FilterButtons>
             <TimeFilter>
@@ -934,6 +1198,7 @@ const Tradehistory = () => {
                 All
               </FilterButton>
             </TimeFilter>
+            </FilterSection>
           </FilterBar>
 
           <TradeHistoryTable>
@@ -941,8 +1206,8 @@ const Tradehistory = () => {
               <div>순위</div>
               <div>NFT</div>
               <div>가격 (BTK)</div>
-              <div>거래량 (BTK)</div>
-              <div>변화</div>
+              <div>수량</div>
+              <div>변화 (%)</div>
               <div>상태</div>
             </TableHeader>
 

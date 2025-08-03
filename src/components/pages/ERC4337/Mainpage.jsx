@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import styled, { keyframes } from "styled-components"
-import loadingGif from "../../../images"
+import loadingGif, { github } from "../../../images"
 import useNewEthers from "../../../hooks/useNewEthers"
 import { CreateNft, getUserInfoOne } from "../../../api/ERC4337/NewApi"
 import { sendEntryPoint } from "../../../api/ERC4337/SendUserOps"
@@ -50,7 +50,7 @@ const fadeInUp = keyframes`
 
 const Container = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50% , #16213e 100%);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   display: flex;
   color: white;
@@ -73,17 +73,11 @@ const Sidebar = styled.div`
   flex-direction: column;
   gap: 32px;
   box-sizing: border-box;
-  
+
   @media (max-width: 768px) {
-    width: 100%;
-    height: auto;
-    position: relative;
-    padding: 16px;
-    gap: 16px;
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: ${props => props.showMobileMenu ? 'flex' : 'none'};
+    display: none;
   }
+
 `
 
 const Logo = styled.div`
@@ -107,10 +101,18 @@ const NavMenu = styled.nav`
   gap: 8px;
   
   @media (max-width: 768px) {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
+    flex: 1;
+  display: flex;
+  flex-direction: column;
+  
+  gap: 8px;
+  }
+  @media (max-width: 480px) {
+    flex: 1;
+  display: flex;
+  flex-direction: column;
+  
+  gap: 8px;
   }
 `
 
@@ -120,6 +122,17 @@ const NavItem = styled.div`
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: ${props => props.className === 'active' ? 'rgba(102, 126, 234, 0.2)' : 'transparent'};
+  border: 1px solid ${props => props.className === 'active' ? 'rgba(102, 126, 234, 0.3)' : 'rgba(255, 255, 255, 0.1)'};
+  color: ${props => props.className === 'active' ? 'white' : '#a0aec0'};
+
+  &:hover {
+    background: ${props => props.className === 'active' ? 'rgba(102, 126, 234, 0.3)' : 'rgba(255, 255, 255, 0.1)'};
+    transform: translateX(4px);
+  }
   
   @media (max-width: 768px) {
     padding: 12px 16px;
@@ -129,19 +142,10 @@ const NavItem = styled.div`
   }
   
   @media (max-width: 480px) {
-    padding: 10px 12px;
+    padding: 0px 12px;
+    height: 40px;
     font-size: 12px;
     min-width: 100px;
-  }
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(102, 126, 234, 0.1);
-  border: 1px solid rgba(102, 126, 234, 0.2);
-
-  &:hover {
-    background: rgba(102, 126, 234, 0.2);
-    transform: translateX(4px);
   }
 `
 
@@ -165,6 +169,19 @@ const LogoutButton = styled.button`
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
   }
+  
+  @media (max-width: 768px) {
+    margin-top: auto;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  @media (max-width: 480px) {
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    font-size: 12px;
+  }
 `
 
 const MobileMenuButton = styled.button`
@@ -175,14 +192,58 @@ const MobileMenuButton = styled.button`
   font-size: 24px;
   cursor: pointer;
   padding: 8px;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
   
   @media (max-width: 768px) {
     display: block;
   }
 `
 
+const slideIn = keyframes`
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+`
+
+const slideOut = keyframes`
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+`
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`
+
+const fadeOut = keyframes`
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+`
+
 const MobileOverlay = styled.div`
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -190,30 +251,57 @@ const MobileOverlay = styled.div`
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
   
   @media (max-width: 768px) {
-    display: ${props => props.showMobileMenu ? 'block' : 'none'};
+    opacity: ${props => props.showMobileMenu ? 1 : 0};
+    visibility: ${props => props.showMobileMenu ? 'visible' : 'hidden'};
+  }
+  
+  @media (min-width: 769px) {
+    display: none;
   }
 `
 
 const MobileSidebar = styled.div`
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
   width: 280px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(26, 32, 44, 0.95);
   backdrop-filter: blur(20px);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   padding: 32px 24px;
   z-index: 1001;
-  animation: slideIn 0.3s ease-out;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
   
   @media (max-width: 768px) {
-    display: ${props => props.showMobileMenu ? 'flex' : 'none'};
-    flex-direction: column;
+    top: 65px;
+    height: calc(100vh - 80px);
     gap: 32px;
+    width: 50%;
+    padding: 24px;
+    transform: ${props => props.showMobileMenu ? 'translateX(0)' : 'translateX(-100%)'};
+  }
+  
+  @media (min-width: 769px) {
+    display: none;
+  }
+  @media (max-width: 480px) {
+    top: 65px;
+    height: calc(100vh - 80px);
+    padding: 16px;
+    gap: 16px;
+    border-radius: 0 15px 15px 0;
+    box-sizing: border-box;
+    transform: ${props => props.showMobileMenu ? 'translateX(0)' : 'translateX(-100%)'};
+    animation: ${props => props.showMobileMenu ? slideIn : slideOut} 0.3s ease-out;
   }
 `
 
@@ -223,35 +311,64 @@ const MainContent = styled.div`
   flex: 1;
   margin-left: 280px;
   padding: 32px 138px;
+  padding-top: 140px;
   overflow-y: auto;
   
   @media (max-width: 768px) {
     margin-left: 0;
     padding: 16px;
+    padding-top: 140px;
   }
   
   @media (max-width: 480px) {
     padding: 12px;
+    padding-top: 140px;
   }
 `
 
 const Header = styled.header`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 0;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 138px;
   margin-bottom: 30px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: fixed;
+  top: 0;
+  left: 280px;
+  right: 0;
+  background: linear-gradient(135deg, #0a0a0aeb 0%, #1a1a2e 70%, #16213e 100%);
+  backdrop-filter: blur(20px);
+  z-index: 100;
   
   @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px 0;
+    gap: 12px;
+    padding: 16px;
+    left: 0;
+    right: 0;
   }
   
   @media (max-width: 480px) {
-    gap: 12px;
-    padding: 12px 0;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+`
+
+const HeaderTop = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`
+
+const HeaderBottom = styled.div`
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  
+  @media (max-width: 768px) {
+    display: flex;
   }
 `
 
@@ -259,15 +376,31 @@ const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
+  min-width: 200px;
+`
+
+const DesktopLogo = styled.div`
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
 `
 
 const HeaderCenter = styled.div`
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: center;
+  flex: 1;
+  max-width: 500px;
   
   @media (max-width: 768px) {
-    width: 100%;
+    display: none;
   }
 `
 
@@ -275,10 +408,13 @@ const HeaderRight = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
+  min-width: 200px;
+  justify-content: flex-end;
+  /* padding-right: 16px; */
   
   @media (max-width: 768px) {
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-end;
   }
 `
 
@@ -332,6 +468,7 @@ const Balance = styled.div`
     display: none;
   }
 `
+
 
 const MobileBalance = styled.div`
   display: none;
@@ -396,6 +533,9 @@ const Content = styled.div`
   
   @media (max-width: 768px) {
     padding: 0;
+  }
+  @media (max-width: 480px) {
+    margin-top : 35px;
   }
 `
 
@@ -772,6 +912,9 @@ const NFTDescription = styled.p`
   font-size: 14px;
   line-height: 1.5;
   /* margin: 0 0 16px 0; */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `
 
 const NFTSeller = styled.div`
@@ -1029,6 +1172,9 @@ const SocialButton = styled.button`
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 
   &:hover {
     background: rgba(255, 255, 255, 0.2);
@@ -1230,7 +1376,7 @@ const SidebarSectionTitle = styled.h3`
   text-align: center;
   
   @media (max-width: 768px) {
-    font-size: 14px;
+    font-size: 16px;
   }
 `
 
@@ -1364,7 +1510,7 @@ const Mainpage = () => {
 
   // Call the hook directly in the component
   const result = useNewEthers(userInfo?.privateKey, userInfo?.smartAcc)
-  
+
   // Update contracts when result changes
   useEffect(() => {
     if (result) {
@@ -1384,7 +1530,7 @@ const Mainpage = () => {
   const createNftMutn = useMutation({
     mutationFn: async (e) => {
       e.preventDefault()
-      const {  NftContract } = Contracts
+      const { NftContract } = Contracts
       const { smartAcc } = userInfo
       const formdata = new FormData()
       const { nftname, nftdesc } = e.target
@@ -1440,6 +1586,7 @@ const Mainpage = () => {
           alert("NFT 추가 오류" + error)
         }
       }
+      alert("nft 추가 완료")
       dispatch({ type: "Loading", payload: false })
       console.log('GG', data, Eventlog)
       // navigate('/mypage')
@@ -1464,7 +1611,7 @@ const Mainpage = () => {
 
   const GetCoin = async () => {
     try {
-      if(!Contracts || !userInfo?.smartAcc) return;
+      if (!Contracts || !userInfo?.smartAcc) return;
       dispatch({ type: "Loading", payload: true })
       const { TokenContract, SmartAccountContract, EntryPointContract, signer } = Contracts
       const { smartAcc } = userInfo
@@ -1474,15 +1621,15 @@ const Mainpage = () => {
         process.env.REACT_APP_BING_TKN_CA,
         value,
         mintCallData,
-      ]) 
-      
+      ])
+
       // Add delay to prevent rate limiting
       await delay(2000)
-      
+
       const response = await retryWithBackoff(async () => {
         return await sendEntryPoint(smartAcc, EntryPointContract, callData, signer)
       })
-      
+
       await TokenContract.on('minted', async (address, amount) => {
         try {
           // Add delay before balance check
@@ -1510,16 +1657,16 @@ const Mainpage = () => {
 
   useEffect(() => {
     if (!Contracts || !userInfo?.smartAcc) return
-    
+
     const fetchBalance = async () => {
       try {
         const { TokenContract } = Contracts
         const { smartAcc } = userInfo
-        if(!smartAcc) return;
-        
+        if (!smartAcc) return;
+
         // Add delay to prevent rate limiting
         await delay(1000)
-        
+
         const balance = await retryWithBackoff(async () => {
           return await TokenContract?.balanceOf(smartAcc)
         })
@@ -1625,28 +1772,28 @@ const Mainpage = () => {
   // Filter NFTs based on search query
   const filteredNFTs = sellnfts?.filter(nft => {
     if (!debouncedSearchQuery.trim()) return true
-    
+
     const nftName = nft.nftUridata?.name || ''
     const nftDescription = nft.nftUridata?.description || ''
     const sellerName = nft.userid || ''
-    
+
     const searchLower = debouncedSearchQuery.toLowerCase()
     const nameLower = nftName.toLowerCase()
     const descLower = nftDescription.toLowerCase()
     const sellerLower = sellerName.toLowerCase()
-    
+
     const matchesName = nameLower.includes(searchLower)
     const matchesDesc = descLower.includes(searchLower)
     const matchesSeller = sellerLower.includes(searchLower)
-    
+
     console.log(`Search: "${debouncedSearchQuery}" | NFT: "${nftName}" | Matches: ${matchesName || matchesDesc || matchesSeller}`)
-    
+
     return matchesName || matchesDesc || matchesSeller
   }) || [];
 
   const ScrollToHash = () => {
     const { hash } = useLocation();
-  
+
     useEffect(() => {
       if (hash) {
         const el = document.getElementById(hash.slice(1)); // remove #
@@ -1655,7 +1802,7 @@ const Mainpage = () => {
         }
       }
     }, [hash]);
-  
+
     return null;
   };
 
@@ -1668,8 +1815,10 @@ const Mainpage = () => {
           <NavItem onClick={() => navigate('/main')} className="active">
             📊 대시보드
           </NavItem>
-          <NavItem onClick={() => {const el = document.getElementById('marketplace')
-            el.scrollIntoView({ behavior: 'smooth' })}}>
+          <NavItem onClick={() => {
+            const el = document.getElementById('marketplace')
+            el.scrollIntoView({ behavior: 'smooth' })
+          }}>
             🛍️ 마켓플레이스
           </NavItem>
           <NavItem onClick={() => navigate('/mypage')}>
@@ -1678,9 +1827,7 @@ const Mainpage = () => {
           <NavItem onClick={() => navigate('/history')}>
             📄 거래 내역
           </NavItem>
-          <NavItem onClick={() => navigate('/settings')}>
-            ⚙️ 설정
-          </NavItem>
+        
         </NavMenu>
         <LogoutButton onClick={LogoutHandler}>
           🚪 로그아웃
@@ -1695,8 +1842,10 @@ const Mainpage = () => {
           <NavItem onClick={() => navigate('/main')} className="active">
             📊 대시보드
           </NavItem>
-          <NavItem onClick={() => {const el = document.getElementById('marketplace')
-            el.scrollIntoView({ behavior: 'smooth' })}}>
+          <NavItem onClick={() => {
+            const el = document.getElementById('marketplace')
+            el.scrollIntoView({ behavior: 'smooth' })
+          }}>
             🛍️ 마켓플레이스
           </NavItem>
           <NavItem onClick={() => navigate('/mypage')}>
@@ -1705,9 +1854,9 @@ const Mainpage = () => {
           <NavItem onClick={() => navigate('/history')}>
             📄 거래 내역
           </NavItem>
-          <NavItem onClick={() => navigate('/settings')}>
+          {/* <NavItem onClick={() => navigate('/settings')}>
             ⚙️ 설정
-          </NavItem>
+          </NavItem> */}
         </NavMenu>
         <LogoutButton onClick={LogoutHandler}>
           🚪 로그아웃
@@ -1716,33 +1865,45 @@ const Mainpage = () => {
 
       <MainContent>
         <Header>
-          <HeaderLeft>
-            <MobileMenuButton onClick={() => setShowMobileMenu(!showMobileMenu)}>
-              ☰
-            </MobileMenuButton>
-          </HeaderLeft>
-          <HeaderCenter>
+          <HeaderTop>
+            <HeaderLeft>
+              <MobileMenuButton onClick={() => setShowMobileMenu(!showMobileMenu)}>
+                ☰
+              </MobileMenuButton>
+              <MobileBalance>
+                💰 {userBalance ? userBalance : 0} BTK
+              </MobileBalance>
+            </HeaderLeft>
+            <HeaderCenter>
+              <SearchBar>
+                <input
+                  type="text"
+                  placeholder="NFT, 컬렉션, 사용자 검색..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </SearchBar>
+            </HeaderCenter>
+            <HeaderRight>
+              <Balance>
+                💰 {userBalance ? userBalance : 0} BTK
+              </Balance>
+              <UserProfile onClick={() => navigate('/mypage')}>
+                <Avatar>{userId?.charAt(0)?.toUpperCase() || 'U'}</Avatar>
+                <span>{userId || '사용자'}</span>
+              </UserProfile>
+            </HeaderRight>
+          </HeaderTop>
+          <HeaderBottom>
             <SearchBar>
-              <input 
-                type="text" 
-                placeholder="NFT, 컬렉션, 사용자 검색..." 
+              <input
+                type="text"
+                placeholder="NFT, 컬렉션, 사용자 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </SearchBar>
-            <MobileBalance>
-              💰 {userBalance ? userBalance : 0}
-            </MobileBalance>
-          </HeaderCenter>
-          <HeaderRight>
-            <Balance>
-              💰 {userBalance ? userBalance : 0} BTK
-            </Balance>
-            <UserProfile onClick={() => navigate('/mypage')}>
-              <Avatar>{userId?.charAt(0)?.toUpperCase() || 'U'}</Avatar>
-              <span>{userId || '사용자'}</span>
-            </UserProfile>
-          </HeaderRight>
+          </HeaderBottom>
         </Header>
 
         <Content>
@@ -1750,23 +1911,21 @@ const Mainpage = () => {
           <FeaturedSection>
             <FeaturedNFT>
               <FeaturedImage>
-                <img src="https://picsum.photos/400/400?random=1" alt="Featured NFT" />
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWQxIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzMzNGI4YztzdG9wLW9wYWNpdHk6MSIgLz4KPHN0b3Agb2Zmc2V0PSIzNSUiIHN0eWxlPSJzdG9wLWNvbG9yOiM0YjM2NzA7c3RvcC1vcGFjaXR5OjEiIC8+CjxzdG9wIG9mZnNldD0iNzAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNzE0Zjk2O3N0b3Atb3BhY2l0eToxIiAvPgo8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM4MzVkNzI7c3RvcC1vcGFjaXR5OjEiIC8+CjwvbGluZWFyR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0iZ3JhZDIiIGN4PSI1MCUiIGN5PSI1MCUiIHI9IjUwJSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmZmZmZmY7c3RvcC1vcGFjaXR5OjAuMDgiIC8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmZmZmZjtzdG9wLW9wYWNpdHk6MCIgLz4KPC9yYWRpYWxHcmFkaWVudD4KPC9kZWZzPgo8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0idXJsKCNncmFkMSkiLz4KPGNpcmNsZSBjeD0iMjAwIiBjeT0iMjAwIiByPSIxNTAiIGZpbGw9InVybCgjZ3JhZDIpIi8+Cjxwb2x5Z29uIHBvaW50cz0iMjAwLDUwIDMxMCwxNTAgMzEwLDI1MCAyMDAsMzUwIDkwLDI1MCA5MCwxNTAiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4wNSkiIHN0cm9rZT0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjE1KSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KPHBvbHlnb24gcG9pbnRzPSIyMDAsMTAwIDI3MCwxNzAgMjcwLDIzMCAyMDAsMzAwIDEzMCwyMzAgMTMwLDE3MCIgZmlsbD0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjA4KSIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMikiIHN0cm9rZS13aWR0aD0iMSIvPgo8Y2lyY2xlIGN4PSIyMDAiIGN5PSIyMDAiIHI9IjQwIiBmaWxsPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMTIpIiBzdHJva2U9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4yNSkiIHN0cm9rZS13aWR0aD0iMSIvPgo8Y2lyY2xlIGN4PSIxNTAiIGN5PSIxMjAiIHI9IjYiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4zKSIvPgo8Y2lyY2xlIGN4PSIyNTAiIGN5PSIxMzAiIHI9IjQiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4yNSkiLz4KPGNpcmNsZSBjeD0iMzIwIiBjeT0iMjAwIiByPSIzIiBmaWxsPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMikiLz4KPGNpcmNsZSBjeD0iODAiIGN5PSIyMDAiIHI9IjUiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4zNSkiLz4KPGNpcmNsZSBjeD0iMTcwIiBjeT0iMzAwIiByPSIzIiBmaWxsPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMjUpIi8+CjxjaXJjbGUgY3g9IjI4MCIgY3k9IjI4MCIgcj0iNSIgZmlsbD0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjMpIi8+Cjwvc3ZnPgo=" alt="Featured NFT" />
               </FeaturedImage>
               <FeaturedDetails>
-                <Timer>⏰ 02h 31m 11s</Timer>
-                <CollectionTitle>ZunoNFT 컬렉션</CollectionTitle>
+                <Timer>⏰</Timer>
+                <CollectionTitle>ZunoNFT </CollectionTitle>
                 <CollectionDescription>
-                  디지털 아트의 미래에 오신 것을 환영합니다. 각 NFT는 고유하며 다양한 희귀도를 가진 랜덤화된 아이템을 소유합니다. 
-                  일부는 매우 희귀하고 애니메이션까지 포함되어 있습니다! 블록체인 아트의 세계를 탐험해보세요.
+                  디지털 아트의 미래에 오신 것을 환영합니다. 여기서 코인을 받고 NFT를 구매할수 있습니다. 본인만의 NFT를 만들어보고 거래해보시는개 추천드립니다.
                 </CollectionDescription>
                 <CreatorInfo>
                   <CreatorAvatar>👤</CreatorAvatar>
                   <CreatorName>ZunoCreator</CreatorName>
                 </CreatorInfo>
                 <SocialLinks>
-                  <SocialButton>🌐 웹사이트</SocialButton>
-                  <SocialButton>📱 디스코드</SocialButton>
-                  <SocialButton>🐦 트위터</SocialButton>
+                  <SocialButton onClick={() => (navigate('/'))}>🌐 웹사이트</SocialButton>
+                                      <SocialButton onClick={() => window.open('https://github.com/Mr-Binod', '_blank')}><img src={github} alt="github" style={{ width: '20px', height: '20px' }} /> github</SocialButton>
                 </SocialLinks>
               </FeaturedDetails>
             </FeaturedNFT>
@@ -1815,7 +1974,7 @@ const Mainpage = () => {
               <ActionButtons>
                 {loading ? (
                   <Button disabled>
-                    <LoadingImage src={loadingGif} />
+                  
                     처리 중...
                   </Button>
                 ) : (
@@ -1823,7 +1982,7 @@ const Mainpage = () => {
                 )}
                 {loading ? (
                   <Button disabled>
-                    <LoadingImage src={loadingGif} />
+              
                     처리 중...
                   </Button>
                 ) : (
@@ -1837,24 +1996,24 @@ const Mainpage = () => {
           <NFTGridSection id="marketplace">
             <SectionHeader>
               <SectionTitle>🛍️ NFT 마켓플레이스</SectionTitle>
-                             <FilterBar>
-                 <FilterButton>📊 아이템</FilterButton>
-                 <FilterButton>📈 분석</FilterButton>
-                 <FilterButton>📋 활동</FilterButton>
-                 <SearchInput 
-                   type="text" 
-                   placeholder="NFT 검색..." 
-                   value={searchQuery}
-                   onChange={(e) => setSearchQuery(e.target.value)}
-                 />
-                 <SortSelect>
-                   <option>가격 낮음에서 높음</option>
-                   <option>가격 높음에서 낮음</option>
-                   <option>최근 등록순</option>
-                 </SortSelect>
-               </FilterBar>
+              <FilterBar>
+                <FilterButton>📊 아이템</FilterButton>
+                <FilterButton>📈 분석</FilterButton>
+                <FilterButton>📋 활동</FilterButton>
+                <SearchInput
+                  type="text"
+                  placeholder="NFT 검색..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <SortSelect>
+                  <option>가격 낮음에서 높음</option>
+                  <option>가격 높음에서 낮음</option>
+                  <option>최근 등록순</option>
+                </SortSelect>
+              </FilterBar>
             </SectionHeader>
-            
+
             <NFTGrid>
               {filteredNFTs.map((el, i) => {
                 return (
@@ -1873,7 +2032,6 @@ const Mainpage = () => {
                       <NFTSeller>판매자: {el.userid}</NFTSeller>
                       {loading ? (
                         <ActionButton disabled>
-                          <LoadingImage src={loadingGif} />
                           처리 중...
                         </ActionButton>
                       ) : el.userid === userId ? (
@@ -1936,7 +2094,6 @@ const Mainpage = () => {
                   </CancelButton>
                   {loading ? (
                     <Button disabled>
-                      <LoadingImage src={loadingGif} />
                       생성 중...
                     </Button>
                   ) : (

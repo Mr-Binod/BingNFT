@@ -5,7 +5,6 @@ import { ethers } from "ethers"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import styled, { keyframes } from "styled-components"
-import loadingGif from "../../../images"
 import { Link, useNavigate } from "react-router-dom"
 import { CheckZero, getUserInfoOne } from "../../../api/ERC4337/NewApi"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
@@ -34,15 +33,9 @@ const Sidebar = styled.div`
   flex-direction: column;
   gap: 32px;
   box-sizing: border-box;
-  
+
   @media (max-width: 768px) {
-    width: 100%;
-    height: auto;
-    position: relative;
-    padding: 16px;
-    gap: 16px;
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: none;
   }
 `
 
@@ -60,6 +53,7 @@ const Logo = styled.div`
   }
 `
 
+
 const NavMenu = styled.nav`
   flex: 1;
   display: flex;
@@ -67,10 +61,18 @@ const NavMenu = styled.nav`
   gap: 8px;
   
   @media (max-width: 768px) {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
+    flex: 1;
+  display: flex;
+  flex-direction: column;
+  
+  gap: 8px;
+  }
+  @media (max-width: 480px) {
+    flex: 1;
+  display: flex;
+  flex-direction: column;
+  
+  gap: 8px;
   }
 `
 
@@ -83,11 +85,12 @@ const NavItem = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(102, 126, 234, 0.1);
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  background: ${props => props.className === 'active' ? 'rgba(102, 126, 234, 0.2)' : 'transparent'};
+  border: 1px solid ${props => props.className === 'active' ? 'rgba(102, 126, 234, 0.3)' : 'rgba(255, 255, 255, 0.1)'};
+  color: ${props => props.className === 'active' ? 'white' : '#a0aec0'};
 
   &:hover {
-    background: rgba(102, 126, 234, 0.2);
+    background: ${props => props.className === 'active' ? 'rgba(102, 126, 234, 0.3)' : 'rgba(255, 255, 255, 0.1)'};
     transform: translateX(4px);
   }
   
@@ -99,7 +102,8 @@ const NavItem = styled.div`
   }
   
   @media (max-width: 480px) {
-    padding: 10px 12px;
+    padding: 0px 12px;
+    height: 40px;
     font-size: 12px;
     min-width: 100px;
   }
@@ -125,6 +129,19 @@ const LogoutButton = styled.button`
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
   }
+  
+  @media (max-width: 768px) {
+    margin-top: auto;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  @media (max-width: 480px) {
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    font-size: 12px;
+  }
 `
 
 const MobileMenuButton = styled.button`
@@ -135,14 +152,58 @@ const MobileMenuButton = styled.button`
   font-size: 24px;
   cursor: pointer;
   padding: 8px;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
   
   @media (max-width: 768px) {
     display: block;
   }
 `
 
+const slideInMobile = keyframes`
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+`
+
+const slideOutMobile = keyframes`
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+`
+
+const fadeInMobile = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`
+
+const fadeOutMobile = keyframes`
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+`
+
 const MobileOverlay = styled.div`
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -150,30 +211,57 @@ const MobileOverlay = styled.div`
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
   
   @media (max-width: 768px) {
-    display: ${props => props.showMobileMenu ? 'block' : 'none'};
+    opacity: ${props => props.showMobileMenu ? 1 : 0};
+    visibility: ${props => props.showMobileMenu ? 'visible' : 'hidden'};
+  }
+  
+  @media (min-width: 769px) {
+    display: none;
   }
 `
 
 const MobileSidebar = styled.div`
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
   width: 280px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(26, 32, 44, 0.95);
   backdrop-filter: blur(20px);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   padding: 32px 24px;
   z-index: 1001;
-  animation: slideIn 0.3s ease-out;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
   
   @media (max-width: 768px) {
-    display: ${props => props.showMobileMenu ? 'flex' : 'none'};
-    flex-direction: column;
+    top: 65px;
+    height: calc(100vh - 80px);
     gap: 32px;
+    width: 50%;
+    padding: 24px;
+    transform: ${props => props.showMobileMenu ? 'translateX(0)' : 'translateX(-100%)'};
+  }
+  
+  @media (min-width: 769px) {
+    display: none;
+  }
+  @media (max-width: 480px) {
+    top: 65px;
+    height: calc(100vh - 80px);
+    padding: 16px;
+    gap: 16px;
+    border-radius: 0 15px 15px 0;
+    box-sizing: border-box;
+    transform: ${props => props.showMobileMenu ? 'translateX(0)' : 'translateX(-100%)'};
+    animation: ${props => props.showMobileMenu ? slideInMobile : slideOutMobile} 0.3s ease-out;
   }
 `
 
@@ -190,26 +278,64 @@ const MainContent = styled.div`
   flex: 1;
   margin-left: 280px;
   padding: 32px 138px;
+  padding-top: 140px;
   overflow-y: auto;
   
   @media (max-width: 768px) {
     margin-left: 0;
     padding: 16px;
+    padding-top: 140px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
+    padding-top: 140px;
   }
 `
 
 const Header = styled.header`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 0;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 138px;
   margin-bottom: 30px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: fixed;
+  top: 0;
+  left: 280px;
+  right: 0;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 60%, #16213e 100%);
+  backdrop-filter: blur(20px);
+  z-index: 100;
   
   @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px 0;
+    gap: 12px;
+    padding: 16px;
+    left: 0;
+    right: 0;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 8px;
+    padding: 12px 16px;
+  }
+`
+
+const HeaderTop = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`
+
+const HeaderBottom = styled.div`
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  
+  @media (max-width: 768px) {
+    display: flex;
   }
 `
 
@@ -217,15 +343,31 @@ const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
+  min-width: 200px;
+`
+
+const DesktopLogo = styled.div`
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
 `
 
 const HeaderCenter = styled.div`
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: center;
+  flex: 1;
+  max-width: 500px;
   
   @media (max-width: 768px) {
-    width: 100%;
+    display: none;
   }
 `
 
@@ -233,10 +375,13 @@ const HeaderRight = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
+  min-width: 200px;
+  justify-content: flex-end;
+  /* padding-right: 16px; */
   
   @media (max-width: 768px) {
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-end;
   }
 `
 
@@ -282,6 +427,8 @@ const Balance = styled.div`
     display: none;
   }
 `
+
+
 
 const MobileBalance = styled.div`
   display: none;
@@ -457,6 +604,9 @@ const NFTDescription = styled.p`
   font-size: 14px;
   line-height: 1.5;
   margin: 0 0 16px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `
 
 const ActionButton = styled.button`
@@ -665,7 +815,7 @@ const Mypage = () => {
       if (Contracts && userinfo?.smartAcc && userinfo.smartAcc !== "0x" && userinfo.smartAcc.length >= 42) {
         try {
           const balance = await TokenContract?.balanceOf(userinfo.smartAcc)
-          
+
           const newBalance = Math.floor(Number(ethers.formatEther(balance)))
           setBalance(newBalance)
           const { data } = await axios.get(`${BaseUrl}/user/${userId}`)
@@ -753,15 +903,13 @@ const Mypage = () => {
           <NavItem onClick={() => navigate('/main#marketplace')}>
             🛍️ 마켓플레이스
           </NavItem>
-          <NavItem onClick={() => navigate('/mypage')} style={{ background: 'rgba(102, 126, 234, 0.2)' }}>
+          <NavItem onClick={() => navigate('/mypage')} className="active">
             💼 포트폴리오
           </NavItem>
           <NavItem onClick={() => navigate('/history')}>
             📄 거래 내역
           </NavItem>
-          <NavItem onClick={() => navigate('/settings')}>
-            ⚙️ 설정
-          </NavItem>
+       
         </NavMenu>
         <LogoutButton onClick={LogoutHandler}>
           🚪 로그아웃
@@ -779,15 +927,13 @@ const Mypage = () => {
           <NavItem onClick={() => navigate('/main#marketplace')}>
             🛍️ 마켓플레이스
           </NavItem>
-          <NavItem onClick={() => navigate('/mypage')} style={{ background: 'rgba(102, 126, 234, 0.2)' }}>
+          <NavItem onClick={() => navigate('/mypage')} className="active">
             💼 포트폴리오
           </NavItem>
           <NavItem onClick={() => navigate('/history')}>
             📄 거래 내역
           </NavItem>
-          <NavItem onClick={() => navigate('/settings')}>
-            ⚙️ 설정
-          </NavItem>
+      
         </NavMenu>
         <LogoutButton onClick={LogoutHandler}>
           🚪 로그아웃
@@ -796,28 +942,36 @@ const Mypage = () => {
 
       <MainContent>
         <Header>
-          <HeaderLeft>
-            <MobileMenuButton onClick={() => setShowMobileMenu(!showMobileMenu)}>
-              ☰
-            </MobileMenuButton>
-          </HeaderLeft>
-          <HeaderCenter>
+          <HeaderTop>
+            <HeaderLeft>
+              <MobileMenuButton onClick={() => setShowMobileMenu(!showMobileMenu)}>
+                ☰
+              </MobileMenuButton>
+              <MobileBalance>
+                💰 {balance ? balance : 0} BTK
+              </MobileBalance>
+              {/* <DesktopLogo>ZunoNFT</DesktopLogo> */}
+            </HeaderLeft>
+            <HeaderCenter>
+              <SearchBar>
+                <input type="text" placeholder="포트폴리오 검색..." />
+              </SearchBar>
+            </HeaderCenter>
+            <HeaderRight>
+              <Balance>
+                💰 {balance ? balance : 0} BTK
+              </Balance>
+              <UserProfile onClick={() => navigate('/mypage')}>
+                <Avatar>{userId?.charAt(0)?.toUpperCase() || 'U'}</Avatar>
+                <span>{userId || '사용자'}</span>
+              </UserProfile>
+            </HeaderRight>
+          </HeaderTop>
+          <HeaderBottom>
             <SearchBar>
               <input type="text" placeholder="포트폴리오 검색..." />
             </SearchBar>
-            <MobileBalance>
-              💰 {balance ? balance : 0}
-            </MobileBalance>
-          </HeaderCenter>
-          <HeaderRight>
-            <Balance>
-              💰 {balance ? balance : 0} BTK
-            </Balance>
-            <UserProfile onClick={() => navigate('/mypage')}>
-              <Avatar>{userId?.charAt(0)?.toUpperCase() || 'U'}</Avatar>
-              <span>{userId || '사용자'}</span>
-            </UserProfile>
-          </HeaderRight>
+          </HeaderBottom>
         </Header>
 
         <Content>
@@ -893,7 +1047,6 @@ const Mypage = () => {
                         <NFTDescription>{el.nftUridata.description}</NFTDescription>
                         {loading ? (
                           <ActionButton disabled>
-                            <LoadingImage src={loadingGif} />
                             처리 중...
                           </ActionButton>
                         ) : (
@@ -947,7 +1100,6 @@ const Mypage = () => {
                           <NFTDescription>{el.nftUridata.description}</NFTDescription>
                           {loading ? (
                             <Button disabled>
-                              <LoadingImage src={loadingGif} />
                               처리 중...
                             </Button>
                           ) : (
