@@ -4,7 +4,7 @@ import axios from "axios"
 import { ethers } from "ethers"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import styled from "styled-components"
+import styled, { keyframes } from "styled-components"
 import loadingGif from "../../../images"
 import { Link, useNavigate } from "react-router-dom"
 import { CheckZero, getUserInfoOne } from "../../../api/ERC4337/NewApi"
@@ -127,6 +127,65 @@ const LogoutButton = styled.button`
   }
 `
 
+const MobileMenuButton = styled.button`
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  
+  @media (max-width: 768px) {
+    display: block;
+  }
+`
+
+const MobileOverlay = styled.div`
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  
+  @media (max-width: 768px) {
+    display: ${props => props.showMobileMenu ? 'block' : 'none'};
+  }
+`
+
+const MobileSidebar = styled.div`
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 280px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 32px 24px;
+  z-index: 1001;
+  animation: slideIn 0.3s ease-out;
+  
+  @media (max-width: 768px) {
+    display: ${props => props.showMobileMenu ? 'flex' : 'none'};
+    flex-direction: column;
+    gap: 32px;
+  }
+`
+
+const slideIn = keyframes`
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+`
+
 const MainContent = styled.div`
   flex: 1;
   margin-left: 280px;
@@ -220,8 +279,23 @@ const Balance = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.1);
   
   @media (max-width: 768px) {
-    padding: 8px 12px;
-    font-size: 14px;
+    display: none;
+  }
+`
+
+const MobileBalance = styled.div`
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+  
+  @media (max-width: 768px) {
+    display: flex;
   }
 `
 
@@ -553,6 +627,7 @@ const Mypage = () => {
   const [userNfts, setUserNfts] = useState(null)
   const [isactive, setIsactive] = useState(false)
   const [selldata, setSelldata] = useState({ userid: "", nftid: null, nftUridata: "" })
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
 
   const { userId, userinfo, loading } = useSelector((state) => state.LoginReducer)
   const Contracts = useSelector((state) => state.contractReducer)
@@ -693,15 +768,46 @@ const Mypage = () => {
         </LogoutButton>
       </Sidebar>
 
+      {/* Mobile Overlay and Sidebar */}
+      <MobileOverlay showMobileMenu={showMobileMenu} onClick={() => setShowMobileMenu(false)} />
+      <MobileSidebar showMobileMenu={showMobileMenu}>
+        <Logo>ZunoNFT</Logo>
+        <NavMenu>
+          <NavItem onClick={() => navigate('/main')}>
+            📊 대시보드
+          </NavItem>
+          <NavItem onClick={() => navigate('/main#marketplace')}>
+            🛍️ 마켓플레이스
+          </NavItem>
+          <NavItem onClick={() => navigate('/mypage')} style={{ background: 'rgba(102, 126, 234, 0.2)' }}>
+            💼 포트폴리오
+          </NavItem>
+          <NavItem onClick={() => navigate('/history')}>
+            📄 거래 내역
+          </NavItem>
+          <NavItem onClick={() => navigate('/settings')}>
+            ⚙️ 설정
+          </NavItem>
+        </NavMenu>
+        <LogoutButton onClick={LogoutHandler}>
+          🚪 로그아웃
+        </LogoutButton>
+      </MobileSidebar>
+
       <MainContent>
         <Header>
           <HeaderLeft>
-            {/* Additional header content can go here */}
+            <MobileMenuButton onClick={() => setShowMobileMenu(!showMobileMenu)}>
+              ☰
+            </MobileMenuButton>
           </HeaderLeft>
           <HeaderCenter>
             <SearchBar>
               <input type="text" placeholder="포트폴리오 검색..." />
             </SearchBar>
+            <MobileBalance>
+              💰 {balance ? balance : 0}
+            </MobileBalance>
           </HeaderCenter>
           <HeaderRight>
             <Balance>

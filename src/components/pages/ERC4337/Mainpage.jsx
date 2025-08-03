@@ -13,6 +13,27 @@ import { uploadIPFS } from "../../../api/ERC4337/Ipfs"
 import axios from "axios"
 import { ethers } from "ethers"
 
+// Rate limiting utility
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+// Retry function with exponential backoff
+const retryWithBackoff = async (fn, maxRetries = 3, baseDelay = 1000) => {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn()
+    } catch (error) {
+      if (error.message.includes('429') || error.message.includes('Too Many Requests')) {
+        const delayMs = baseDelay * Math.pow(2, i)
+        console.log(`Rate limited, retrying in ${delayMs}ms...`)
+        await delay(delayMs)
+        continue
+      }
+      throw error
+    }
+  }
+  throw new Error('Max retries exceeded')
+}
+
 // Animations
 const fadeInUp = keyframes`
   from {
@@ -25,16 +46,7 @@ const fadeInUp = keyframes`
   }
 `
 
-const slideIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-`
+
 
 const Container = styled.div`
   min-height: 100vh;
@@ -169,6 +181,44 @@ const MobileMenuButton = styled.button`
   }
 `
 
+const MobileOverlay = styled.div`
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  
+  @media (max-width: 768px) {
+    display: ${props => props.showMobileMenu ? 'block' : 'none'};
+  }
+`
+
+const MobileSidebar = styled.div`
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 280px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 32px 24px;
+  z-index: 1001;
+  animation: slideIn 0.3s ease-out;
+  
+  @media (max-width: 768px) {
+    display: ${props => props.showMobileMenu ? 'flex' : 'none'};
+    flex-direction: column;
+    gap: 32px;
+  }
+`
+
+
+
 const MainContent = styled.div`
   flex: 1;
   margin-left: 280px;
@@ -279,8 +329,23 @@ const Balance = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.1);
   
   @media (max-width: 768px) {
-    padding: 8px 12px;
-    font-size: 14px;
+    display: none;
+  }
+`
+
+const MobileBalance = styled.div`
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+  
+  @media (max-width: 768px) {
+    display: flex;
   }
 `
 
@@ -1297,13 +1362,15 @@ const Mainpage = () => {
     retry: 3,
   })
 
-  const CallHookFn = () => {
-    const result = useNewEthers(userInfo.privateKey, userInfo.smartAcc)
-    dispatch({ type: 'Contracts', payload: result })
-  }
+  // Call the hook directly in the component
+  const result = useNewEthers(userInfo?.privateKey, userInfo?.smartAcc)
+  
+  // Update contracts when result changes
   useEffect(() => {
-    if (userInfo) CallHookFn()
-  }, [userInfo])
+    if (result) {
+      dispatch({ type: 'Contracts', payload: result })
+    }
+  }, [result, dispatch])
 
   // Debounce search query
   useEffect(() => {
@@ -1408,18 +1475,25 @@ const Mainpage = () => {
         value,
         mintCallData,
       ]) 
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      const response = await sendEntryPoint(smartAcc, EntryPointContract, callData, signer)
+      
+      // Add delay to prevent rate limiting
+      await delay(2000)
+      
+      const response = await retryWithBackoff(async () => {
+        return await sendEntryPoint(smartAcc, EntryPointContract, callData, signer)
+      })
+      
       await TokenContract.on('minted', async (address, amount) => {
         try {
           // Add delay before balance check
-          await new Promise(resolve => setTimeout(resolve, 1000))
-          const balance = await TokenContract.balanceOf(smartAcc)
+          await delay(1000)
+          const balance = await retryWithBackoff(async () => {
+            return await TokenContract.balanceOf(smartAcc)
+          })
           const newBalance = ethers.formatEther(balance)
           setUserBalance(newBalance)
           dispatch({ type: "Loading", payload: false })
           await queryClient.invalidateQueries({ queryKey: ["user"] })
-          // console.log("response mainpage", newBalance, response)
           console.log(address, amount)
         } catch (error) {
           console.error('Error in minted event handler:', error)
@@ -1427,27 +1501,6 @@ const Mainpage = () => {
         }
       })
 
-      // await new Promise((resolve, reject) => {
-      //     const listener = async (owner, value) => {
-      //         if (owner.toLowerCase() === smartAcc.toLowerCase()) {
-      //             const balance = await TokenContract.balanceOf(smartAcc)
-      //             const newBalance = ethers.formatEther(balance)
-      //             setUserBalance(newBalance)
-
-      //             console.log("Minted:", owner, value.toString())
-      //             console.log("response mainpage", newBalance, response)
-      //             TokenContract.off("minted", listener) // Clean up the listener
-      //             resolve()
-      //         }
-      //     }
-      //     setTimeout(() => {
-      //         TokenContract.off("minted", listener)
-      //         reject(new Error("Timeout: 'minted' event not received"))
-      //     }, 60000) // 30 seconds
-      //     TokenContract.on("minted", listener)
-      // })
-      // dispatch({ type: "Loading", payload: false })
-      // await queryClient.invalidateQueries({ queryKey: ["user"] })
     } catch (error) {
       console.error('Error in GetCoin:', error)
       dispatch({ type: "Loading", payload: false })
@@ -1465,9 +1518,11 @@ const Mainpage = () => {
         if(!smartAcc) return;
         
         // Add delay to prevent rate limiting
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await delay(1000)
         
-        const balance = await TokenContract?.balanceOf(smartAcc)
+        const balance = await retryWithBackoff(async () => {
+          return await TokenContract?.balanceOf(smartAcc)
+        })
         const newbalance = balance.toString()
         const newBalance = Math.floor(Number(ethers.formatEther(balance)))
 
@@ -1632,6 +1687,33 @@ const Mainpage = () => {
         </LogoutButton>
       </Sidebar>
 
+      {/* Mobile Overlay and Sidebar */}
+      <MobileOverlay showMobileMenu={showMobileMenu} onClick={() => setShowMobileMenu(false)} />
+      <MobileSidebar showMobileMenu={showMobileMenu}>
+        <Logo>ZunoNFT</Logo>
+        <NavMenu>
+          <NavItem onClick={() => navigate('/main')} className="active">
+            📊 대시보드
+          </NavItem>
+          <NavItem onClick={() => {const el = document.getElementById('marketplace')
+            el.scrollIntoView({ behavior: 'smooth' })}}>
+            🛍️ 마켓플레이스
+          </NavItem>
+          <NavItem onClick={() => navigate('/mypage')}>
+            💼 포트폴리오
+          </NavItem>
+          <NavItem onClick={() => navigate('/history')}>
+            📄 거래 내역
+          </NavItem>
+          <NavItem onClick={() => navigate('/settings')}>
+            ⚙️ 설정
+          </NavItem>
+        </NavMenu>
+        <LogoutButton onClick={LogoutHandler}>
+          🚪 로그아웃
+        </LogoutButton>
+      </MobileSidebar>
+
       <MainContent>
         <Header>
           <HeaderLeft>
@@ -1648,6 +1730,9 @@ const Mainpage = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </SearchBar>
+            <MobileBalance>
+              💰 {userBalance ? userBalance : 0}
+            </MobileBalance>
           </HeaderCenter>
           <HeaderRight>
             <Balance>
