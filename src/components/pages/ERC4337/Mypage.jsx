@@ -34,8 +34,16 @@ const Sidebar = styled.div`
   flex-direction: column;
   gap: 32px;
   box-sizing: border-box;
-
-
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding: 16px;
+    gap: 16px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
 `
 
 const Logo = styled.div`
@@ -61,7 +69,8 @@ const NavMenu = styled.nav`
   @media (max-width: 768px) {
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 8px;
+    justify-content: center;
   }
 `
 
@@ -80,6 +89,19 @@ const NavItem = styled.div`
   &:hover {
     background: rgba(102, 126, 234, 0.2);
     transform: translateX(4px);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 12px 16px;
+    font-size: 14px;
+    min-width: 120px;
+    text-align: center;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px 12px;
+    font-size: 12px;
+    min-width: 100px;
   }
 `
 
@@ -651,35 +673,23 @@ const Mypage = () => {
         <Logo>ZunoNFT</Logo>
         <NavMenu>
           <NavItem onClick={() => navigate('/main')}>
-            📊 Dashboard
+            📊 대시보드
           </NavItem>
           <NavItem onClick={() => navigate('/main#marketplace')}>
-            🛍️ Marketplace
-          </NavItem>
-          <NavItem onClick={() => navigate('/bids')}>
-            🔨 Active Bids
-          </NavItem>
-          <NavItem onClick={() => navigate('/favorites')}>
-            ❤️ Favourites
-          </NavItem>
-          <NavItem onClick={() => navigate('/collections')}>
-            📁 Collections
-          </NavItem>
-          <NavItem onClick={() => navigate('/launchpad')}>
-            🚀 Launchpad
+            🛍️ 마켓플레이스
           </NavItem>
           <NavItem onClick={() => navigate('/mypage')} style={{ background: 'rgba(102, 126, 234, 0.2)' }}>
-            💼 Portfolio
+            💼 포트폴리오
           </NavItem>
           <NavItem onClick={() => navigate('/history')}>
-            📄 Trade History
+            📄 거래 내역
           </NavItem>
           <NavItem onClick={() => navigate('/settings')}>
-            ⚙️ Settings
+            ⚙️ 설정
           </NavItem>
         </NavMenu>
         <LogoutButton onClick={LogoutHandler}>
-          🚪 Log Out
+          🚪 로그아웃
         </LogoutButton>
       </Sidebar>
 
@@ -690,7 +700,7 @@ const Mypage = () => {
           </HeaderLeft>
           <HeaderCenter>
             <SearchBar>
-              <input type="text" placeholder="Search portfolio..." />
+              <input type="text" placeholder="포트폴리오 검색..." />
             </SearchBar>
           </HeaderCenter>
           <HeaderRight>
@@ -699,15 +709,15 @@ const Mypage = () => {
             </Balance>
             <UserProfile onClick={() => navigate('/mypage')}>
               <Avatar>{userId?.charAt(0)?.toUpperCase() || 'U'}</Avatar>
-              <span>{userId || 'User'}</span>
+              <span>{userId || '사용자'}</span>
             </UserProfile>
           </HeaderRight>
         </Header>
 
         <Content>
-          <PageTitle>Portfolio</PageTitle>
+          <PageTitle>포트폴리오</PageTitle>
           <PageSubtitle>
-            Manage your NFTs, view your collection, and track your trading activities
+            NFT를 관리하고, 컬렉션을 확인하며, 거래 활동을 추적하세요
           </PageSubtitle>
 
           {isactive && (

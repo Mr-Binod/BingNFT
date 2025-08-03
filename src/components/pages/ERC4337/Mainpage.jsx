@@ -61,8 +61,17 @@ const Sidebar = styled.div`
   flex-direction: column;
   gap: 32px;
   box-sizing: border-box;
-
-
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding: 16px;
+    gap: 16px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: ${props => props.showMobileMenu ? 'flex' : 'none'};
+  }
 `
 
 const Logo = styled.div`
@@ -88,7 +97,8 @@ const NavMenu = styled.nav`
   @media (max-width: 768px) {
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 8px;
+    justify-content: center;
   }
 `
 
@@ -98,6 +108,19 @@ const NavItem = styled.div`
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
+  
+  @media (max-width: 768px) {
+    padding: 12px 16px;
+    font-size: 14px;
+    min-width: 120px;
+    text-align: center;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px 12px;
+    font-size: 12px;
+    min-width: 100px;
+  }
   display: flex;
   align-items: center;
   gap: 12px;
@@ -132,6 +155,20 @@ const LogoutButton = styled.button`
   }
 `
 
+const MobileMenuButton = styled.button`
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  
+  @media (max-width: 768px) {
+    display: block;
+  }
+`
+
 const MainContent = styled.div`
   flex: 1;
   margin-left: 280px;
@@ -141,6 +178,10 @@ const MainContent = styled.div`
   @media (max-width: 768px) {
     margin-left: 0;
     padding: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
   }
 `
 
@@ -156,6 +197,11 @@ const Header = styled.header`
     flex-direction: column;
     gap: 16px;
     padding: 16px 0;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 12px;
+    padding: 12px 0;
   }
 `
 
@@ -211,6 +257,14 @@ const SearchBar = styled.div`
   
   @media (max-width: 768px) {
     width: 100%;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px 12px;
+    
+    input {
+      font-size: 13px;
+    }
   }
 `
 
@@ -567,6 +621,16 @@ const NFTGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 24px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 `
 
 const NFTCard = styled.div`
@@ -581,16 +645,40 @@ const NFTCard = styled.div`
     transform: translateY(-4px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
   }
+  
+  @media (max-width: 768px) {
+    padding: 16px 0px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px 0px;
+  }
 `
 
 const NFTImage = styled.img`
   width: 100%;
   height: 250px;
   object-fit: cover;
+  
+  @media (max-width: 768px) {
+    height: 200px;
+  }
+  
+  @media (max-width: 480px) {
+    height: 180px;
+  }
 `
 
 const NFTContent = styled.div`
   padding: 20px;
+  
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
 `
 
 const NFTTitle = styled.h3`
@@ -1164,6 +1252,7 @@ const Mainpage = () => {
     nftidToken: null,
   })
   const [showNftModal, setShowNftModal] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
 
   const Contracts = useSelector((state) => state.contractReducer)
   const { userId, loading, islogin } = useSelector((state) => state.LoginReducer)
@@ -1250,7 +1339,7 @@ const Mainpage = () => {
       const data = await CreateNft(IpfsUri, smartAcc)
 
       console.log(data, "data")
-      const filter = NftContract.filters.TokenURICreated() // create a filter
+      const filter = await NftContract.filters.TokenURICreated() // create a filter
       const events = await NftContract.queryFilter(filter, 0, "latest") // from block 0 to latest
       const latestEvent = await NftContract.queryFilter(filter, "latest", "latest") // from block 0 to latest
       console.log(latestEvent, "Lastest")
@@ -1286,7 +1375,7 @@ const Mainpage = () => {
       }
       dispatch({ type: "Loading", payload: false })
       console.log('GG', data, Eventlog)
-      navigate('/mypage')
+      // navigate('/mypage')
       return Eventlog
 
       // cant do with erc 4337 check later
@@ -1373,6 +1462,7 @@ const Mainpage = () => {
       try {
         const { TokenContract } = Contracts
         const { smartAcc } = userInfo
+        if(!smartAcc) return;
         
         // Add delay to prevent rate limiting
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -1517,53 +1607,43 @@ const Mainpage = () => {
   return (
     <Container>
       <ScrollToHash />
-      <Sidebar>
+      <Sidebar showMobileMenu={showMobileMenu}>
         <Logo>ZunoNFT</Logo>
         <NavMenu>
           <NavItem onClick={() => navigate('/main')} className="active">
-            📊 Dashboard
+            📊 대시보드
           </NavItem>
           <NavItem onClick={() => {const el = document.getElementById('marketplace')
             el.scrollIntoView({ behavior: 'smooth' })}}>
-            🛍️ Marketplace
-          </NavItem>
-          <NavItem onClick={() => navigate('/bids')}>
-            🔨 Active Bids
-          </NavItem>
-          <NavItem onClick={() => navigate('/favorites')}>
-            ❤️ Favourites
-          </NavItem>
-          <NavItem onClick={() => navigate('/collections')}>
-            📁 Collections
-          </NavItem>
-          <NavItem onClick={() => navigate('/launchpad')}>
-            🚀 Launchpad
+            🛍️ 마켓플레이스
           </NavItem>
           <NavItem onClick={() => navigate('/mypage')}>
-            💼 Portfolio
+            💼 포트폴리오
           </NavItem>
           <NavItem onClick={() => navigate('/history')}>
-            📄 Trade History
+            📄 거래 내역
           </NavItem>
           <NavItem onClick={() => navigate('/settings')}>
-            ⚙️ Settings
+            ⚙️ 설정
           </NavItem>
         </NavMenu>
         <LogoutButton onClick={LogoutHandler}>
-          🚪 Log Out
+          🚪 로그아웃
         </LogoutButton>
       </Sidebar>
 
       <MainContent>
         <Header>
           <HeaderLeft>
-            {/* <Logo>ZunoNFT</Logo> */}
+            <MobileMenuButton onClick={() => setShowMobileMenu(!showMobileMenu)}>
+              ☰
+            </MobileMenuButton>
           </HeaderLeft>
           <HeaderCenter>
             <SearchBar>
               <input 
                 type="text" 
-                placeholder="Search NFTs, collections, and users..." 
+                placeholder="NFT, 컬렉션, 사용자 검색..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -1575,7 +1655,7 @@ const Mainpage = () => {
             </Balance>
             <UserProfile onClick={() => navigate('/mypage')}>
               <Avatar>{userId?.charAt(0)?.toUpperCase() || 'U'}</Avatar>
-              <span>{userId || 'User'}</span>
+              <span>{userId || '사용자'}</span>
             </UserProfile>
           </HeaderRight>
         </Header>
@@ -1589,19 +1669,19 @@ const Mainpage = () => {
               </FeaturedImage>
               <FeaturedDetails>
                 <Timer>⏰ 02h 31m 11s</Timer>
-                <CollectionTitle>ZunoNFT Collection</CollectionTitle>
+                <CollectionTitle>ZunoNFT 컬렉션</CollectionTitle>
                 <CollectionDescription>
-                  Welcome to the future of digital art. Each NFT is unique and owns randomized items with different rarities. 
-                  Some are super rare and even animated! Explore the world of blockchain art.
+                  디지털 아트의 미래에 오신 것을 환영합니다. 각 NFT는 고유하며 다양한 희귀도를 가진 랜덤화된 아이템을 소유합니다. 
+                  일부는 매우 희귀하고 애니메이션까지 포함되어 있습니다! 블록체인 아트의 세계를 탐험해보세요.
                 </CollectionDescription>
                 <CreatorInfo>
                   <CreatorAvatar>👤</CreatorAvatar>
                   <CreatorName>ZunoCreator</CreatorName>
                 </CreatorInfo>
                 <SocialLinks>
-                  <SocialButton>🌐 WEBSITE</SocialButton>
-                  <SocialButton>📱 DISCORD</SocialButton>
-                  <SocialButton>🐦 TWITTER</SocialButton>
+                  <SocialButton>🌐 웹사이트</SocialButton>
+                  <SocialButton>📱 디스코드</SocialButton>
+                  <SocialButton>🐦 트위터</SocialButton>
                 </SocialLinks>
               </FeaturedDetails>
             </FeaturedNFT>
@@ -1611,34 +1691,34 @@ const Mainpage = () => {
           <StatsSection>
             <StatsGrid>
               <StatCard>
-                <StatLabel>Floor Price</StatLabel>
+                <StatLabel>최저가</StatLabel>
                 <StatValue>1.28 BTK</StatValue>
                 <StatChange>+5.2%</StatChange>
               </StatCard>
               <StatCard>
-                <StatLabel>Volume</StatLabel>
+                <StatLabel>거래량</StatLabel>
                 <StatValue>45.02 BTK</StatValue>
                 <StatChange>+12.8%</StatChange>
               </StatCard>
               <StatCard>
-                <StatLabel>Market Cap</StatLabel>
+                <StatLabel>시가총액</StatLabel>
                 <StatValue>9,035.28 BTK</StatValue>
                 <StatChange>+8.4%</StatChange>
               </StatCard>
               <StatCard>
-                <StatLabel>Avg. Price</StatLabel>
+                <StatLabel>평균가</StatLabel>
                 <StatValue>21.23 BTK</StatValue>
                 <StatChange>+3.1%</StatChange>
               </StatCard>
               <StatCard>
-                <StatLabel>Sales</StatLabel>
+                <StatLabel>판매량</StatLabel>
                 <StatValue>113</StatValue>
                 <StatChange>+15.2%</StatChange>
               </StatCard>
               <StatCard>
-                <StatLabel>Supply</StatLabel>
+                <StatLabel>공급량</StatLabel>
                 <StatValue>890</StatValue>
-                <StatChange>Fixed</StatChange>
+                <StatChange>고정</StatChange>
               </StatCard>
             </StatsGrid>
           </StatsSection>
@@ -1672,22 +1752,22 @@ const Mainpage = () => {
           <NFTGridSection id="marketplace">
             <SectionHeader>
               <SectionTitle>🛍️ NFT 마켓플레이스</SectionTitle>
-              <FilterBar>
-                <FilterButton>📊 Items</FilterButton>
-                <FilterButton>📈 Analytics</FilterButton>
-                <FilterButton>📋 Activity</FilterButton>
-                <SearchInput 
-                  type="text" 
-                  placeholder="Search NFTs..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <SortSelect>
-                  <option>Price low to high</option>
-                  <option>Price high to low</option>
-                  <option>Recently listed</option>
-                </SortSelect>
-              </FilterBar>
+                             <FilterBar>
+                 <FilterButton>📊 아이템</FilterButton>
+                 <FilterButton>📈 분석</FilterButton>
+                 <FilterButton>📋 활동</FilterButton>
+                 <SearchInput 
+                   type="text" 
+                   placeholder="NFT 검색..." 
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                 />
+                 <SortSelect>
+                   <option>가격 낮음에서 높음</option>
+                   <option>가격 높음에서 낮음</option>
+                   <option>최근 등록순</option>
+                 </SortSelect>
+               </FilterBar>
             </SectionHeader>
             
             <NFTGrid>

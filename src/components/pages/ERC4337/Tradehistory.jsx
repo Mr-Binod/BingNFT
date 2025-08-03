@@ -59,8 +59,16 @@ const Sidebar = styled.div`
   flex-direction: column;
   gap: 32px;
   box-sizing: border-box;
-
-
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding: 16px;
+    gap: 16px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
 `
 
 
@@ -87,7 +95,8 @@ const NavMenu = styled.nav`
   @media (max-width: 768px) {
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 8px;
+    justify-content: center;
   }
 `
 
@@ -98,6 +107,19 @@ const NavItem = styled.div`
   transition: all 0.3s ease;
   font-weight: 500;
   display: flex;
+  
+  @media (max-width: 768px) {
+    padding: 12px 16px;
+    font-size: 14px;
+    min-width: 120px;
+    text-align: center;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px 12px;
+    font-size: 12px;
+    min-width: 100px;
+  }
   align-items: center;
   gap: 12px;
   background: rgba(102, 126, 234, 0.1);
@@ -541,7 +563,7 @@ const Tradehistory = () => {
           setBalance(newBalance)
           const filter = Contracts.NftContract.filters.history();
           const allEvents = await Contracts.NftContract.queryFilter(filter, 0, "latest")
-
+          
           // Process all events first
           const allEventData = []
           for (const event of allEvents) {
@@ -690,35 +712,23 @@ const Tradehistory = () => {
         <Logo>ZunoNFT</Logo>
         <NavMenu>
           <NavItem onClick={() => navigate('/main')}>
-            📊 Dashboard
+            📊 대시보드
           </NavItem>
           <NavItem onClick={() => navigate('/main#marketplace')}>
-            🛍️ Marketplace
-          </NavItem>
-          <NavItem onClick={() => navigate('/bids')}>
-            🔨 Active Bids
-          </NavItem>
-          <NavItem onClick={() => navigate('/favorites')}>
-            ❤️ Favourites
-          </NavItem>
-          <NavItem onClick={() => navigate('/collections')}>
-            📁 Collections
-          </NavItem>
-          <NavItem onClick={() => navigate('/launchpad')}>
-            🚀 Launchpad
+            🛍️ 마켓플레이스
           </NavItem>
           <NavItem onClick={() => navigate('/mypage')}>
-            💼 Portfolio
+            💼 포트폴리오
           </NavItem>
           <NavItem onClick={() => navigate('/history')} style={{ background: 'rgba(102, 126, 234, 0.2)' }}>
-            📄 Trade History
+            📄 거래 내역
           </NavItem>
           <NavItem onClick={() => navigate('/settings')}>
-            ⚙️ Settings
+            ⚙️ 설정
           </NavItem>
         </NavMenu>
         <LogoutButton onClick={LogoutHandler}>
-          🚪 Log Out
+          🚪 로그아웃
         </LogoutButton>
       </Sidebar>
 
@@ -731,7 +741,7 @@ const Tradehistory = () => {
             <SearchBar>
               <input
                 type="text"
-                placeholder="Search NFT names..."
+                placeholder="NFT 이름 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -743,15 +753,15 @@ const Tradehistory = () => {
             </Balance>
             <UserProfile onClick={() => navigate('/mypage')}>
               <Avatar>{userId?.charAt(0)?.toUpperCase() || 'U'}</Avatar>
-              <span>{userId || 'User'}</span>
+              <span>{userId || '사용자'}</span>
             </UserProfile>
           </HeaderRight>
         </Header>
 
         <Content>
-          <PageTitle>Trade History</PageTitle>
+          <PageTitle>거래 내역</PageTitle>
           <PageSubtitle>
-            Track all NFT transactions, sales, and trading activities across the platform
+            플랫폼 전체의 모든 NFT 거래, 판매 및 거래 활동을 추적하세요
           </PageSubtitle>
 
           <FilterBar>
@@ -760,31 +770,31 @@ const Tradehistory = () => {
                 active={activeFilter === 'all'}
                 onClick={() => setActiveFilter('all')}
               >
-                All Trades
+                모든 거래
               </FilterButton>
               <FilterButton
                 active={activeFilter === 'completed'}
                 onClick={() => setActiveFilter('completed')}
               >
-                Completed
+                완료됨
               </FilterButton>
               <FilterButton
                 active={activeFilter === 'pending'}
                 onClick={() => setActiveFilter('pending')}
               >
-                Pending
+                대기중
               </FilterButton>
               <FilterButton
                 active={activeFilter === 'failed'}
                 onClick={() => setActiveFilter('failed')}
               >
-                Failed
+                실패
               </FilterButton>
               <FilterButton
                 active={activeFilter === 'minted'}
                 onClick={() => setActiveFilter('minted')}
               >
-                Minted
+                민팅됨
               </FilterButton>
             </FilterButtons>
             <TimeFilter>
@@ -817,17 +827,17 @@ const Tradehistory = () => {
 
           <TradeHistoryTable>
             <TableHeader>
-              <div>Rank</div>
+              <div>순위</div>
               <div>NFT</div>
-              <div>Price (BTK)</div>
-              <div>Volume (BTK)</div>
-              <div>Change</div>
-              <div>Status</div>
+              <div>가격 (BTK)</div>
+              <div>거래량 (BTK)</div>
+              <div>변화</div>
+              <div>상태</div>
             </TableHeader>
 
             {loading ? (
               <div style={{ padding: '40px', textAlign: 'center', color: '#a0aec0' }}>
-                Loading trade history...
+                거래 내역을 불러오는 중...
               </div>
             ) : filteredHistory.length > 0 ? (
               filteredHistory?.map((trade, i) => (
@@ -859,9 +869,9 @@ const Tradehistory = () => {
             ) : (
               <EmptyState>
                 <EmptyIcon>📊</EmptyIcon>
-                <EmptyTitle>Loading Trade History</EmptyTitle>
+                <EmptyTitle>거래 내역 불러오는 중</EmptyTitle>
                 <EmptyDescription>
-                  No trades have been recorded yet. Start trading NFTs to see your history here.
+                  아직 기록된 거래가 없습니다. NFT 거래를 시작하여 여기서 내역을 확인하세요.
                 </EmptyDescription>
               </EmptyState>
             )}
@@ -874,12 +884,12 @@ const Tradehistory = () => {
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
               >
-                ← Previous
+                ← 이전
               </PaginationButton>
 
               <PageInfo>
-                Page {currentPage} of {totalPages}
-                ({totalEvents} total events)
+                페이지 {currentPage} / {totalPages}
+                (총 {totalEvents}개 이벤트)
               </PageInfo>
 
               {/* Page Numbers */}
@@ -912,7 +922,7 @@ const Tradehistory = () => {
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
               >
-                Next →
+                다음 →
               </PaginationButton>
             </PaginationContainer>
           )}

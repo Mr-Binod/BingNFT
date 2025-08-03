@@ -50,6 +50,10 @@ const Container = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
   }
+  
+  @media (max-width: 480px) {
+    min-height: 100vh;
+  }
 `
 
 const LeftPanel = styled.div`
@@ -65,6 +69,10 @@ const LeftPanel = styled.div`
   @media (max-width: 768px) {
     min-height: 300px;
     flex: none;
+  }
+  
+  @media (max-width: 480px) {
+    min-height: 250px;
   }
 `
 
@@ -123,8 +131,7 @@ const PlatformSubtitle = styled.p`
   line-height: 1.6;
   
   @media (max-width: 768px) {
-    font-size: 16px;
-    margin-bottom: 24px;
+    display: none;
   }
 `
 
@@ -135,8 +142,7 @@ const FeaturesList = styled.div`
   margin-bottom: 30px;
   
   @media (max-width: 768px) {
-    gap: 12px;
-    margin-bottom: 24px;
+    display: none;
   }
 `
 
@@ -179,7 +185,7 @@ const StatsContainer = styled.div`
   justify-content: center;
   
   @media (max-width: 768px) {
-    gap: 20px;
+    display: none;
   }
 `
 
@@ -345,12 +351,20 @@ const RightPanel = styled.div`
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding: 40px 20px;
   }
+  
+  @media (max-width: 480px) {
+    padding: 30px 16px;
+  }
 `
 
 const FormContainer = styled.div`
   width: 100%;
   max-width: 400px;
   animation: ${fadeInUp} 0.6s ease-out;
+  
+  @media (max-width: 480px) {
+    max-width: 100%;
+  }
 `
 
 const FormTitle = styled.h1`
@@ -363,6 +377,11 @@ const FormTitle = styled.h1`
   @media (max-width: 768px) {
     font-size: 28px;
     margin-bottom: 30px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 24px;
+    margin-bottom: 24px;
   }
 `
 
@@ -550,6 +569,10 @@ const LoadingImage = styled.img`
   box-sizing: border-box;
 `
 
+const SignupButtonWrapper = styled.div`
+  margin-top: 30px;
+`
+
 const SignupLink = styled.div`
   text-align: center;
   margin-top: 30px;
@@ -608,13 +631,16 @@ const Newpage = () => {
       dispatch({ type: "Loading", payload: true })
       const response = await CreateAcc(data)
       // console.log(response)
-      if (response.state === 200) alert("가입 완료되었습니다")
+      if (response.state === 200) {
+        alert("가입 완료되었습니다")
+        // Switch to login mode after successful signup
+        setShowSignup(false)
+      }
       if (response.state === 201) alert("이미 사용되고 있는 아이디 입니다")
 
       signupid.value = ""
       signuppw.value = ""
       dispatch({ type: "Loading", payload: false })
-      navigate("/")
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["user"])
@@ -648,45 +674,45 @@ const Newpage = () => {
         <MedusaBust />
         <FloatingShapes />
         <PlatformInfo>
-          <PlatformTitle>Welcome to ZunoNFT</PlatformTitle>
+          <PlatformTitle>ZunoNFT에 오신 것을 환영합니다</PlatformTitle>
           <PlatformSubtitle>
-            The next-generation NFT marketplace built on ERC-4337 Account Abstraction. 
-            Create, trade, and collect unique digital assets with enhanced security and user experience.
+            ERC-4337 계정 추상화를 기반으로 구축된 차세대 NFT 마켓플레이스입니다. 
+            향상된 보안과 사용자 경험으로 고유한 디지털 자산을 생성, 거래하고 수집하세요.
           </PlatformSubtitle>
           <FeaturesList>
             <FeatureItem>
               <FeatureIcon>🔒</FeatureIcon>
-              <span>Account Abstraction Security</span>
+              <span>계정 추상화 보안</span>
             </FeatureItem>
             <FeatureItem>
               <FeatureIcon>⚡</FeatureIcon>
-              <span>Gasless Transactions</span>
+              <span>가스비 없는 거래</span>
             </FeatureItem>
             <FeatureItem>
               <FeatureIcon>🎨</FeatureIcon>
-              <span>Unique Digital Artworks</span>
+              <span>고유한 디지털 아트워크</span>
             </FeatureItem>
             <FeatureItem>
               <FeatureIcon>💎</FeatureIcon>
-              <span>Rare NFT Collections</span>
+              <span>희귀한 NFT 컬렉션</span>
             </FeatureItem>
             <FeatureItem>
               <FeatureIcon>🌐</FeatureIcon>
-              <span>Cross-Chain Compatibility</span>
+              <span>크로스체인 호환성</span>
             </FeatureItem>
           </FeaturesList>
           <StatsContainer>
             <StatItem>
               <StatNumber>10K+</StatNumber>
-              <StatLabel>NFTs Created</StatLabel>
+              <StatLabel>생성된 NFT</StatLabel>
             </StatItem>
             <StatItem>
               <StatNumber>5K+</StatNumber>
-              <StatLabel>Active Users</StatLabel>
+              <StatLabel>활성 사용자</StatLabel>
             </StatItem>
             <StatItem>
               <StatNumber>100+</StatNumber>
-              <StatLabel>Collections</StatLabel>
+              <StatLabel>컬렉션</StatLabel>
             </StatItem>
           </StatsContainer>
         </PlatformInfo>
@@ -694,7 +720,7 @@ const Newpage = () => {
       
       <RightPanel>
         <FormContainer>
-          <FormTitle>{showSignup ? "Sign Up" : "Login"}</FormTitle>
+          <FormTitle>{showSignup ? "회원가입" : "로그인"}</FormTitle>
           
           {/* <GoogleButton type="button">
             <span>G</span>
@@ -702,66 +728,70 @@ const Newpage = () => {
           </GoogleButton> */}
           
           <Divider>
-            <span>or</span>
+            <span>또는</span>
           </Divider>
           
           {showSignup ? (
             <Form onSubmit={(e) => signUpHandler.mutate(e)}>
               <InputGroup>
-                <Label>Username</Label>
-                <Input type="text" name="signupid" placeholder="Enter your username" />
+                <Label>사용자명</Label>
+                <Input type="text" name="signupid" placeholder="사용자명을 입력하세요" />
               </InputGroup>
               <InputGroup>
-                <Label>Password</Label>
-                <Input type="password" name="signuppw" placeholder="At least 4 letters or numbers" />
+                <Label>비밀번호</Label>
+                <Input type="password" name="signuppw" placeholder="최소 4자 이상의 문자나 숫자" />
               </InputGroup>
               {loading ? (
-                <Button disabled>
-                  <LoadingImage src={loadingGif} />
-                  Creating account...
-                </Button>
+                <SignupButtonWrapper>
+                  <Button disabled>
+                    <LoadingImage src={loadingGif} />
+                    계정 생성 중...
+                  </Button>
+                </SignupButtonWrapper>
               ) : (
-                <Button type="submit">Sign Up</Button>
+                <SignupButtonWrapper>
+                  <Button type="submit">회원가입</Button>
+                </SignupButtonWrapper>
               )}
             </Form>
           ) : (
             <Form onSubmit={(e) => loginHandler(e)}>
               <InputGroup>
-                <Label>Username</Label>
-                <Input type="text" name="userid" placeholder="Enter your username" />
+                <Label>사용자명</Label>
+                <Input type="text" name="userid" placeholder="사용자명을 입력하세요" />
               </InputGroup>
               <InputGroup>
-                <Label>Password</Label>
-                <Input type="password" name="userpw" placeholder="Enter your password" />
+                <Label>비밀번호</Label>
+                <Input type="password" name="userpw" placeholder="비밀번호를 입력하세요" />
               </InputGroup>
               <OptionsRow>
                 <CheckboxGroup>
                   <Checkbox type="checkbox" id="remember" />
-                  <CheckboxLabel htmlFor="remember">Remember me</CheckboxLabel>
+                  <CheckboxLabel htmlFor="remember">로그인 상태 유지</CheckboxLabel>
                 </CheckboxGroup>
-                <ForgotPassword href="#">Forgot password?</ForgotPassword>
+                <ForgotPassword href="#">비밀번호를 잊으셨나요?</ForgotPassword>
               </OptionsRow>
               {loading ? (
-                <Button disabled>
-                  <LoadingImage src={loadingGif} />
-                  Logging in...
-                </Button>
+                                  <Button disabled>
+                    <LoadingImage src={loadingGif} />
+                    로그인 중...
+                  </Button>
               ) : (
-                <Button type="submit">Log in</Button>
+                                  <Button type="submit">로그인</Button>
               )}
             </Form>
           )}
           
           <SignupLink>
-            {showSignup ? "Already have an account?" : "Don't have an account?"}
+            {showSignup ? "이미 계정이 있으신가요?" : "계정이 없으신가요?"}
             <a href="#" onClick={(e) => { e.preventDefault(); setShowSignup(!showSignup); }}>
-              {showSignup ? "Log in" : "Sign up"}
+              {showSignup ? "로그인" : "회원가입"}
             </a>
           </SignupLink>
 
           {isPending && (
             <StatusMessage>
-              Processing...
+              처리 중...
             </StatusMessage>
           )}
         </FormContainer>
