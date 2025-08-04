@@ -443,7 +443,13 @@ const FilterSection = styled.div`
   @media (min-width: 769px) {
     flex-direction: row;
     align-items: center;
-  }`
+  }
+  @media (min-width: 480px) {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+  `
 
 const FilterButtons = styled.div`
   display: flex;
