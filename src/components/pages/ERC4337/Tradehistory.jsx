@@ -222,6 +222,9 @@ const HeaderTop = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  @media (max-width: 480px) {
+    width: 300px;
+  }
 `
 
 const HeaderBottom = styled.div`
@@ -271,7 +274,7 @@ const HeaderRight = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
-  min-width: 200px;
+  /* min-width: 200px; */
   justify-content: flex-end;
   /* padding-right: 16px; */
   
@@ -437,13 +440,20 @@ const FilterBar = styled.div`
 const FilterSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 590px;
+  gap: 16px;
   
   
   @media (min-width: 769px) {
     flex-direction: row;
     align-items: center;
-  }`
+    gap: 590px;
+  }
+  @media (min-width: 480px) {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+  `
 
 const FilterButtons = styled.div`
   display: flex;
@@ -475,6 +485,13 @@ const FilterButton = styled.button`
     font-size: 12px;
     flex: 1;
     min-width: fit-content;
+  }
+  @media (max-width: 480px) {
+    padding: 8px 12px;
+    font-size: 12px;
+    flex: 1;
+    min-width: fit-content;
+    max-width: max-content;
   }
 `
 

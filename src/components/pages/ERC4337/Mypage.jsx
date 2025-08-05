@@ -375,7 +375,7 @@ const HeaderRight = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
-  min-width: 200px;
+  /* min-width: 200px; */
   justify-content: flex-end;
   /* padding-right: 16px; */
   

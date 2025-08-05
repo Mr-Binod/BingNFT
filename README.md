@@ -30,15 +30,20 @@ ZunoNFT는 블록체인에서 계정 추상화 erc4337 로직 사용해서 사�
 </div>
 
 
-## 화면 구성 :
+## 화면 구성 
+### desktop view
 <label >회원 가입 (블록에 기록 되기때문에 시간 좀 소요됩니다)</label> </br> 
-<img src="./src/images/signup.gif"><br><br>
+<img src="./src/images/desktopview.gif"><br><br>
 <label>NFT 생성</label></br>
-<img src="./src/images/nftUpload.gif"></br></br>
+<img src="./src/images/mintdesktop.gif"></br></br>
+
+### mobile view
 <label>NFT 판매</label></br>
-<img src="./src/images/sellnft.gif"><br><br>
+<img src="./src/images/mobileLogin.gif"><br><br>
 <label>NFT 구매</label></br>
-<img src="./src/images/buynft.gif"></br>
+<img src="./src/images/mobilePages.gif"></br>
+<label>NFT 구매</label></br>
+<img src="./src/images/mint.gif"></br>
 
 
 
@@ -97,35 +102,6 @@ ZunoNFT는 블록체인에서 계정 추상화 erc4337 로직 사용해서 사�
 | DELETE | `/sellnft` | 사용자의 판매 NFT 삭제 |
 | DELETE | `/sellnftcontractsellnft` | 사용자의 판매 NFT를 컨트랙트에서 삭제 |
 | DELETE | `/checkzero` | NFT 수량이 0이면 삭제 |
-<!-- get  : /account   전체 계정 조회
-get  : /account/:id   id 사용자 계정 조회
-get  : /userop  mempool 조회
-get  : /user/:user   user의 nft 조회
-get  : /sellnft   sellnft list 조
-get :  /sellnft/:userid/:nftid  user의 nft 조회
-
-
-patch : /sellnft  사용자의 구매했던 nft 추가
-
-
-post : /account   계정 생성
-post : /createnft  NFT 생성 
-post : /userop  entrypoing 호출
-post : /wallet  wallet 생성
-post : /nft   nft 생성 db 저장
-post : /createnft   nft create 호
-post : /creteusernft  user nft 생성 db 저
-post : /sellnft   nft 팔기
-post : /contractsellnft   sell contract 호출
-post : /buynft   nft 구매
-post : /contractbuynft   contract buy 호출
-
-
-delete : /sellnft  사용자의 판매 nft 삭제
-delete : /sellnftcontractsellnft  사용자의 판매 nft contract 에서 삭제
-delete : checkzero     nft 량 0 이면 삭제 -->
-
-
 
 
 ## 기술 스택 
@@ -171,56 +147,36 @@ test & contract deployment
 - INFURA
 - PINATA
 
+#### AI
+- cursor
+- chatgpt
+- gemini
+
 # 회고 로그 
 <!-- - 프로젝트 목표, 계획, 구현, 유지보수, 회고 -->
 ### 구현
-- ERC4337 블록체인 기능을 활용해서 토큰 발행할수 있고 가지고 있는 토큰으로 NFT 거래할수 있는 플랫품을 개발하게 되었습니다.
-- 사용자가 가입하면 WALLET 이랑 SMART ACCOUNT 계정을 생성되고 WHITE LIST 에 등록되고 WHITE LIST 등록 된 SMART CONTRACT 들의 GASFEE 대납자가 지불하게 됩니다
-- 사용자의 정보, NFT정보, 판매 NFT LIST들이 DATABASE 에 저장했습니다
+- ERC4337 블록체인 기능을 활용해서 토큰 발행, NFT 생성 및 거래할수 있는 플랫품을 개발하게 되었습니다.
+- 사용자가 가입하면 WALLET 이랑 SMART ACCOUNT 계정을 생성되고 WHITE LIST 에 등록되어 WHITE LIST 등록 된 SMART CONTRACT 들의 GASFEE 대납자가 지불하게 됩니다
+- 사용자의 정보, NFT정보, 판매 NFT LIST들이 DATABASE 에 저장하게 했습니다
 - 백엔드는 NESTJS 사용했고 프론트는 REACT 사요하고 CONTRACT는 SOLIDITY 사용해서 구현하게 되었습니다.
-- 프론트는 보기 쉽고 심플하게 구현 했습니다
-- chain 에 논스 켭치기 않기 위해 컨트랙트 처리 될때까지 로딩 처리
+- mainpage에서는 사용자의 포트폴리오, 거래 내역과 데시보드를 확인할수 있습니다.
+- chain 에 논스 켭치기 않기 위해 컨트랙트 처리 될때까지 로딩 처리했습니다.
+- 웹과 모바일 반응형도 처리해놨습니다.
 
 ### 문제점 및 해결
 - ERC4337 사용해서 ERC1155 로직을 호출할때 에러가 발생했고 구현이 어려웠습니다
-- 그래서 대납자 사용해서 ERC1155 컨트랙트를 호출하게 되었습니다
+그래서 대납자 사용해서 ERC1155 컨트랙트를 호출하게 되었습니다
 - NESTJS 사용해서 백엔드 구현할때 배우면서 해야되기때문에 어려움이 겪였습니다 
 - ENV 로직 호출, 데이터베이스 설게, 의존성 주입, 타입 정의 같은 불편함을 저리하면서 환성하였습니다
 - 회원 가입으나 거래할때 시간좀 걸리고 사용자가 이탈한 불편함
+- aws 백엔트 배포할때 메모리가 부족해서 메모리 스왑해서 2GB 로 올리고 처리했습니다.
+- cursor 사용할때 prompt 랑 디벙깅 하는개의 신경좀 썼습니다다
 
 ### 계획
-- 가입이나 거래 로직을 실행할때 소요된 시간 컨트랙트에서 처리된 부분과 UI쪽에서 다르고 유저가 빠르게 볼수 있게 할 예정
+
 - 스왑 기능 주가 예정
 - 화면 디자인 더 예쁘게 디자인 할 예정
 - 토큰 발행기능을 저움에 무료하고 3 번지나면 유로로 할 예정
 - 거래가되면 수수료 확보할 예정 
-
-
-
-
- //                         try {
-    //                             // Add delay between IPFS requests
-    //                             if (i > 0) await new Promise(resolve => setTimeout(resolve, 200));
-                                
-    //                             const uridata = await axios.get(`https://gateway.pinata.cloud/ipfs/${imgInfo}`, {
-    //                                 timeout: 5000 // 5 second timeout
-    //                             });
-    //                             const imgpath = uridata.data.image.replace("ipfs://", "https://gateway.pinata.cloud/ipfs/");
-    //                             const newUridata = uridata.data;
-    //                             newUridata.image = imgpath;
-                                
-    //                             console.log(`Processed event ${i + 1}/${successfulEvents.length}:`, { from, to, id, value, newUridata });
-    //                             throttledSetEvents({ from, to, id, value, imgData: newUridata });
-    //                         } catch (ipfsError) {
-    //                             console.error('IPFS fetch error:', ipfsError);
-    //                             throttledSetEvents({ from, to, id, value, imgData: null });
-    //                         }
-    //                     } else {
-    //                         throttledSetEvents({ from, to, id, value, imgData: null });
-    //                     }
-    //                 } catch (eventError) {
-    //                     console.error('Error processing event:', eventError);
-    //                 }
-    //             }
-                
-                return History
+- 추가 nft platform 의 필요한 기능들이 찾으면서 추가할 예정
+- 카카오 로그인이랑 구굴 로그인 기능 추가 
