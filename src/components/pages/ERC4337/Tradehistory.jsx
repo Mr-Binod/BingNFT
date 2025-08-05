@@ -886,7 +886,7 @@ const Tradehistory = () => {
   const [loading, setLoading] = useState(true)
   const [balance, setBalance] = useState(0)
   const [activeFilter, setActiveFilter] = useState('all')
-  const [timeFilter, setTimeFilter] = useState('24h')
+  const [timeFilter, setTimeFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
@@ -915,6 +915,7 @@ const Tradehistory = () => {
           const filter = Contracts.NftContract.filters.history();
           const allEvents = await Contracts.NftContract.queryFilter(filter, 0, "latest")
           
+          console.log(allEvents, 'allEvents')
           // Process all events first
           const allEventData = []
           for (const event of allEvents) {
@@ -928,6 +929,7 @@ const Tradehistory = () => {
             // Add timestamp to the event data
             const timestamp = event.blockNumber ? await event.getBlock().then(block => block.timestamp) : Date.now() / 1000
             allEventData.push({ from, to, id, amount, price, trade, change, newUridata, timestamp })
+            console.log(allEventData, 'allEventData')
           }
 
           // Filter all events based on activeFilter, timeFilter, and debouncedSearchQuery
