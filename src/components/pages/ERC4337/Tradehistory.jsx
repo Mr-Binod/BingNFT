@@ -1000,13 +1000,13 @@ const Tradehistory = () => {
   })
 
   // Debounce search query
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setDebouncedSearchQuery(searchQuery)
-  //   }, 500) // 500ms delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery)
+    }, 500) // 500ms delay
 
-  //   return () => clearTimeout(timer)
-  // }, [searchQuery])
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
   useEffect(() => {
     setEvents([])
