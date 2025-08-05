@@ -919,9 +919,7 @@ const Tradehistory = () => {
           const allEventData = []
           for (const event of allEvents) {
             const { from, to, id, amount, price, trade, uri } = event.args
-            const uridata = await axios.get(`https://gateway.pinata.cloud/ipfs/${uri}`, {
-              timeout: 1000 // 5 second timeout
-            });
+            const uridata = await axios.get(`https://gateway.pinata.cloud/ipfs/${uri}`);
             const imgpath = uridata.data.image.replace("ipfs://", "https://gateway.pinata.cloud/ipfs/");
             const newUridata = uridata.data;
             newUridata.image = imgpath;
