@@ -915,7 +915,7 @@ const Tradehistory = () => {
           const filter = Contracts.NftContract.filters.history();
           const allEvents = await Contracts.NftContract.queryFilter(filter, 0, "latest")
           
-          console.log(allEvents, 'allEvents')
+          // console.log(allEvents, 'allEvents')
           // Process all events first
           const allEventData = []
           for (const event of allEvents) {
@@ -929,7 +929,7 @@ const Tradehistory = () => {
             // Add timestamp to the event data
             const timestamp = event.blockNumber ? await event.getBlock().then(block => block.timestamp) : Date.now() / 1000
             allEventData.push({ from, to, id, amount, price, trade, change, newUridata, timestamp })
-            console.log(allEventData, 'allEventData')
+            // console.log(allEventData, 'allEventData')
           }
 
           // Filter all events based on activeFilter, timeFilter, and debouncedSearchQuery

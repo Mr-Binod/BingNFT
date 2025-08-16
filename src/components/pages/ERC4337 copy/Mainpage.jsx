@@ -406,7 +406,7 @@ const Mainpage = () => {
       const File = e.target.file.files[0]
       dispatch({ type: "Loading", payload: true })
 
-      console.log(nftname.value, nftdesc.value, File)
+      // console.log(nftname.value, nftdesc.value, File)
       if (!nftname.value.trim() || !nftdesc.value.trim() || !File) {
         dispatch({ type: "Loading", payload: false })
         return alert("모든 필드를 채워주세요.");
@@ -415,7 +415,7 @@ const Mainpage = () => {
       const nftDesc = nftdesc.value
 
       formdata.append("file", File)
-      console.log(formdata)
+      // console.log(formdata)
 
       const IpfsUri = await uploadIPFS({ formdata, nftName, nftDesc })
       const data = await CreateNft(IpfsUri, smartAcc)
@@ -423,7 +423,7 @@ const Mainpage = () => {
       const filter = NftContract.filters.TokenURICreated() // create a filter
       const events = await NftContract.queryFilter(filter, 0, "latest") // from block 0 to latest
       const latestEvent = await NftContract.queryFilter(filter, "latest", "latest") // from block 0 to latest
-      console.log(latestEvent, "Lastest")
+      // console.log(latestEvent, "Lastest")
       for (const event of events) {
         const { tokenId, sender, uri } = event.args
         try {
@@ -455,7 +455,7 @@ const Mainpage = () => {
           alert("NFT 추가 오류" + error)
         }
       }
-      console.log('GG', data, Eventlog)
+      // console.log('GG', data, Eventlog)
       navigate('/mypage')
       return Eventlog
 
@@ -544,7 +544,7 @@ const Mainpage = () => {
     const _data = { smartAccAddress: sender, nftid }
     const stringifyData = JSON.stringify(nftUridata)
     const updataData = { userid, nftid, nftUridata: stringifyData, nftidToken }
-    console.log(_data)
+    // console.log(_data)
     const confirmed = window.confirm("판매 취소 하시겠습니까?")
     if (!confirmed) return
     dispatch({ type: "Loading", payload: true })
